@@ -23,7 +23,16 @@ import {
 } from '@chakra-ui/react';
 import { TimeIcon } from '@chakra-ui/icons';
 
-const IssueCard = ({ issue }) => {
+const IssueCard = ({ issue, isNew, onNewSeen }) => {
+  // Marquer comme vu si c'est nouveau
+  React.useEffect(() => {
+    if (isNew && onNewSeen) {
+      const timer = setTimeout(() => {
+        onNewSeen();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isNew, onNewSeen]);
   // --- Configuration des couleurs par statut ---
   const statusConfig = {
     open: { label: 'Ouvert', colorScheme: 'blue' },
@@ -77,10 +86,12 @@ const IssueCard = ({ issue }) => {
       bg={cardBg}
       borderRadius="xl"
       overflow="hidden"
-      border="1px"
-      borderColor={borderColor}
-      shadow="sm"
+      border="2px"
+      borderColor={isNew ? 'green.400' : borderColor}
+      shadow={isNew ? 'xl' : 'sm'}
       transition="all 0.2s"
+      position="relative"
+      className={isNew ? 'new-issue-card' : ''}
       _hover={{
         shadow: 'lg',
         transform: 'translateY(-4px)',
@@ -88,6 +99,25 @@ const IssueCard = ({ issue }) => {
         textDecoration: 'none',
       }}
     >
+      {isNew && (
+        <Badge
+          position="absolute"
+          top="-8px"
+          right="12px"
+          bg="green.400"
+          color="white"
+          fontSize="xs"
+          fontWeight="bold"
+          px={2}
+          py={1}
+          borderRadius="full"
+          zIndex={10}
+          textTransform="uppercase"
+          className="badge-new"
+        >
+          ✨ Nouveau
+        </Badge>
+      )}
       {/* --- Section image --- */}
       <Box position="relative" h="180px" overflow="hidden">
         {issue.photoUrl ? (

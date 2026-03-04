@@ -50,3 +50,114 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: #a1a1a1;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS TEMPS RÉEL - Notifications
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Animation de pulsation pour les cartes "NEW" */
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+}
+
+.new-issue-card {
+  animation: pulse-border 2s infinite;
+}
+
+/* Animation scintillement pour la badge "NEW" */
+@keyframes badge-bounce {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+.badge-new {
+  animation: badge-bounce 0.8s ease-in-out;
+}
+
+/* Animation clignotement pour les notifications */
+@keyframes blink-notification {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0.6;
+  }
+}
+
+.blink-notification {
+  animation: blink-notification 1s infinite;
+}
+
+/* Animation rotation pour le badge de notification */
+@keyframes notification-spin {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+.notification-badge {
+  animation: notification-spin 0.6s ease-out;
+}
+
+/* Animation d'entrée douce pour les nouveaux éléments */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.new-issue-card {
+  animation: slide-in 0.3s ease-out, pulse-border 2s infinite;
+}
+
+/* Animation pour surligner les changements */
+@keyframes highlight {
+  0% {
+    background-color: rgba(34, 197, 94, 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight-update {
+  animation: highlight 1s ease-out;
+}
+
+/* Toast notifications */
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+[role="status"] {
+  animation: toast-slide-in 0.3s ease-out;
+}
+
+

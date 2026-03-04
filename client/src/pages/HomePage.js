@@ -28,6 +28,7 @@ import {
   Flex,
   Icon,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import IssueMap from '../components/IssueMap';
@@ -46,8 +47,10 @@ const HomePage = () => {
     search: ''
   });
   const [viewMode, setViewMode] = useState('map');    // 'map' ou 'cards'
+  const [newIssueIds, setNewIssueIds] = useState(new Set()); // IDs des signalements "NEW"
   
   const { socket } = useSocket();
+  const toast = useToast();
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
@@ -84,6 +87,17 @@ const HomePage = () => {
     // Nouveau signalement créé par un autre utilisateur
     const handleNewIssue = (newIssue) => {
       setIssues(prev => [newIssue, ...prev]);
+      setNewIssueIds(prev => new Set([...prev, newIssue.id]));
+      
+      // Toast notification
+      toast({
+        title: '🆕 Nouveau signalement!',
+        description: `"${newIssue.title}" vient d'être signalé`,
+        status: 'info',
+        duration: 5,
+        isClosable: true,
+        position: 'bottom-right',
+      });
     };
 
     // Mise à jour du nombre de votes
@@ -91,6 +105,15 @@ const HomePage = () => {
       setIssues(prev => prev.map(issue => 
         issue.id === issueId ? { ...issue, voteCount } : issue
       ));
+      
+      toast({
+        title: '👍 Vote reçu!',
+        description: `Un nouveau vote a été ajouté`,
+        status: 'success',
+        duration: 3,
+        isClosable: true,
+        position: 'bottom-right',
+      });
     };
 
     // Changement de statut
@@ -98,11 +121,36 @@ const HomePage = () => {
       setIssues(prev => prev.map(issue => 
         issue.id === issueId ? { ...issue, status } : issue
       ));
+      
+      const statusLabels = {
+        open: 'Ouvert',
+        in_progress: 'En cours',
+        resolved: 'Résolu',
+        closed: 'Fermé'
+      };
+      
+      toast({
+        title: '📋 Statut mis à jour',
+        description: `Le signalement est maintenant "${statusLabels[status]}"`,
+        status: 'info',
+        duration: 3,
+        isClosable: true,
+        position: 'bottom-right',
+      });
     };
 
     // Suppression d'un signalement
     const handleDeleteIssue = ({ issueId }) => {
       setIssues(prev => prev.filter(issue => issue.id !== issueId));
+      
+      toast({
+        title: '🗑️ Signalement supprimé',
+        description: `Le signalement a été supprimé`,
+        status: 'warning',
+        duration: 3,
+        isClosable: true,
+        position: 'bottom-right',
+      });
     };
 
     // Abonnement aux événements
@@ -118,7 +166,7 @@ const HomePage = () => {
       socket.off('issue:status', handleStatusUpdate);
       socket.off('issue:delete', handleDeleteIssue);
     };
-  }, [socket]);
+  }, [socket, toast]);
 
   // --- Gestion des filtres ---
   const handleFilterChange = (e) => {
@@ -176,15 +224,29 @@ const HomePage = () => {
               Consultez, signalez et votez pour les problèmes de votre quartier. 
               Ensemble, améliorons notre cadre de vie.
             </Text>
-            <Badge 
-              colorScheme="green" 
-              fontSize="sm" 
-              px={3} 
-              py={1} 
-              borderRadius="full"
-            >
-              {issues.length} signalement(s) actif(s)
-            </Badge>
+            <HStack spacing={2}>
+              <Badge 
+                colorScheme="green" 
+                fontSize="sm" 
+                px={3} 
+                py={1} 
+                borderRadius="full"
+              >
+                {issues.length} signalement(s) actif(s)
+              </Badge>
+              {newIssueIds.size > 0 && (
+                <Badge 
+                  colorScheme="blue" 
+                  fontSize="sm" 
+                  px={3} 
+                  py={1} 
+                  borderRadius="full"
+                  className="blink-notification"
+                >
+                  🆕 {newIssueIds.size} nouveau(x)
+                </Badge>
+              )}
+            </HStack>
           </VStack>
         </Container>
       </Box>
@@ -319,7 +381,16 @@ const HomePage = () => {
                 ) : (
                   <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
                     {issues.map(issue => (
-                      <IssueCard key={issue.id} issue={issue} />
+                      <IssueCard 
+                        key={issue.id} 
+                        issue={issue} 
+                        isNew={newIssueIds.has(issue.id)}
+                        onNewSeen={() => setNewIssueIds(prev => {
+                          const updated = new Set(prev);
+                          updated.delete(issue.id);
+                          return updated;
+                        })}
+                      />
                     ))}
                   </SimpleGrid>
                 )}
