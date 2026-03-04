@@ -1,33 +1,44 @@
-const { Issue, User, Vote, sequelize } = require('../models');
-const { Op } = require('sequelize');
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: controllers/issue.controller.js
+// Gère toutes les opérations CRUD sur les signalements (issues).
+// Inclut la création, lecture, vote, changement de statut et suppression.
+// Émet des events WebSocket pour les mises à jour temps réel.
+// ═══════════════════════════════════════════════════════════════════════════
 
-// Create a new issue
+const { Issue, User, Vote, sequelize } = require('../models');
+const { Op } = require('sequelize'); // Opérateurs Sequelize (LIKE, BETWEEN, etc.)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CRÉER UN SIGNALEMENT (POST /api/issues)
+// Crée un nouveau signalement avec titre, description, localisation et photo.
+// Émet un event WebSocket "issue:new" pour notifier tous les clients.
+// ═══════════════════════════════════════════════════════════════════════════
 const createIssue = async (req, res) => {
   try {
     const { title, description, latitude, longitude, address, category } = req.body;
     
-    // Validate required fields
+    // --- Validation des champs obligatoires ---
     if (!title || !description || latitude === undefined || longitude === undefined) {
       return res.status(400).json({ 
         message: 'Title, description, and location (latitude/longitude) are required' 
       });
     }
 
-    // Validate title length
+    // --- Validation de la longueur du titre (5-200 caractères) ---
     if (title.length < 5 || title.length > 200) {
       return res.status(400).json({ 
         message: 'Title must be between 5 and 200 characters' 
       });
     }
 
-    // Validate description length
+    // --- Validation de la longueur de la description (10-5000 caractères) ---
     if (description.length < 10 || description.length > 5000) {
       return res.status(400).json({ 
         message: 'Description must be between 10 and 5000 characters' 
       });
     }
 
-    // Validate coordinates
+    // --- Validation des coordonnées GPS ---
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
     
@@ -39,13 +50,13 @@ const createIssue = async (req, res) => {
       return res.status(400).json({ message: 'Invalid longitude' });
     }
 
-    // Handle uploaded photo
+    // --- Gestion de la photo uploadée (optionnel) ---
     let photoUrl = null;
     if (req.file) {
-      photoUrl = `/uploads/${req.file.filename}`;
+      photoUrl = `/uploads/${req.file.filename}`;  // URL relative
     }
 
-    // Create the issue
+    // --- Création du signalement en base ---
     const issue = await Issue.create({
       title: title.trim(),
       description: description.trim(),
@@ -54,11 +65,11 @@ const createIssue = async (req, res) => {
       address: address || null,
       category: category || 'other',
       photoUrl,
-      userId: req.user.id,
-      status: 'open'
+      userId: req.user.id,  // L'auteur est l'utilisateur connecté
+      status: 'open'        // Statut initial
     });
 
-    // Fetch the issue with reporter info
+    // --- Récupère le signalement avec les infos du reporter ---
     const issueWithReporter = await Issue.findByPk(issue.id, {
       include: [{
         model: User,
@@ -67,7 +78,8 @@ const createIssue = async (req, res) => {
       }]
     });
 
-    // Emit WebSocket event for real-time updates
+    // --- ÉMET UN EVENT WEBSOCKET "issue:new" (TEMPS RÉEL) ---
+    // Tous les clients connectés recevront ce nouveau signalement
     const io = req.app.get('io');
     if (io) {
       io.emit('issue:new', issueWithReporter);
@@ -87,36 +99,39 @@ const createIssue = async (req, res) => {
   }
 };
 
-// Get all issues with filtering
+// ═══════════════════════════════════════════════════════════════════════════
+// LISTER LES SIGNALEMENTS (GET /api/issues)
+// Retourne les signalements avec filtres optionnels (status, category, search).
+// Supporte la pagination et le tri.
+// ═══════════════════════════════════════════════════════════════════════════
 const getIssues = async (req, res) => {
   try {
+    // --- Extraction des paramètres de requête ---
     const { 
-      status, 
-      category, 
-      search, 
-      lat, 
-      lng, 
-      radius,
-      page = 1, 
-      limit = 20,
-      sortBy = 'createdAt',
-      order = 'DESC'
+      status,           // Filtre par statut (open, in_progress, resolved, closed)
+      category,         // Filtre par catégorie (road, lighting, waste, etc.)
+      search,           // Recherche texte dans titre/description
+      lat, lng, radius, // Filtre géographique (autour d'un point)
+      page = 1,         // Numéro de page (pagination)
+      limit = 20,       // Nombre de résultats par page
+      sortBy = 'createdAt', // Champ de tri
+      order = 'DESC'    // Ordre de tri (ASC ou DESC)
     } = req.query;
 
     const where = {};
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    // Filter by status
+    // --- Filtre par statut ---
     if (status && ['open', 'in_progress', 'resolved', 'closed'].includes(status)) {
       where.status = status;
     }
 
-    // Filter by category
+    // --- Filtre par catégorie ---
     if (category && ['road', 'lighting', 'waste', 'greenery', 'safety', 'noise', 'other'].includes(category)) {
       where.category = category;
     }
 
-    // Search in title and description
+    // --- Recherche texte (LIKE insensible à la casse) ---
     if (search) {
       where[Op.or] = [
         { title: { [Op.iLike]: `%${search}%` } },
@@ -124,15 +139,15 @@ const getIssues = async (req, res) => {
       ];
     }
 
-    // Filter by location (within radius in km)
+    // --- Filtre géographique : dans un rayon en km ---
     if (lat && lng && radius) {
       const latNum = parseFloat(lat);
       const lngNum = parseFloat(lng);
       const radiusNum = parseFloat(radius);
       
       if (!isNaN(latNum) && !isNaN(lngNum) && !isNaN(radiusNum)) {
-        // Approximate bounding box
-        const latDelta = radiusNum / 111; // 1 degree ≈ 111km
+        // Calcul approximatif de la bounding box
+        const latDelta = radiusNum / 111; // 1 degré ≈ 111km
         const lngDelta = radiusNum / (111 * Math.cos(latNum * Math.PI / 180));
         
         where.latitude = { [Op.between]: [latNum - latDelta, latNum + latDelta] };
@@ -140,11 +155,12 @@ const getIssues = async (req, res) => {
       }
     }
 
-    // Validate sort options
+    // --- Validation des options de tri ---
     const validSortFields = ['createdAt', 'voteCount', 'status'];
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
     const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
+    // --- Requête avec pagination ---
     const { count, rows: issues } = await Issue.findAndCountAll({
       where,
       include: [{
@@ -173,7 +189,10 @@ const getIssues = async (req, res) => {
   }
 };
 
-// Get single issue by ID
+// ═══════════════════════════════════════════════════════════════════════════
+// RÉCUPÉRER UN SIGNALEMENT (GET /api/issues/:id)
+// Retourne les détails d'un signalement avec ses votes et son auteur.
+// ═══════════════════════════════════════════════════════════════════════════
 const getIssueById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -188,7 +207,7 @@ const getIssueById = async (req, res) => {
         {
           model: Vote,
           as: 'votes',
-          attributes: ['userId']
+          attributes: ['userId']  // On récupère juste les userId pour savoir qui a voté
         }
       ]
     });
@@ -197,7 +216,7 @@ const getIssueById = async (req, res) => {
       return res.status(404).json({ message: 'Issue not found' });
     }
 
-    // Check if current user has voted
+    // --- Vérifie si l'utilisateur connecté a déjà voté ---
     let userHasVoted = false;
     if (req.user) {
       userHasVoted = issue.votes.some(vote => vote.userId === req.user.id);
@@ -205,7 +224,7 @@ const getIssueById = async (req, res) => {
 
     res.json({
       ...issue.toJSON(),
-      userHasVoted
+      userHasVoted  // Indique au frontend si le user peut encore voter
     });
 
   } catch (error) {
@@ -214,14 +233,20 @@ const getIssueById = async (req, res) => {
   }
 };
 
-// Vote on an issue
+// ═══════════════════════════════════════════════════════════════════════════
+// VOTER SUR UN SIGNALEMENT (POST /api/issues/:id/vote)
+// Ajoute un vote de l'utilisateur connecté. Un user ne peut voter qu'une fois.
+// Utilise une transaction pour garantir la cohérence.
+// Émet un event WebSocket "issue:vote" pour mettre à jour le compteur en temps réel.
+// ═══════════════════════════════════════════════════════════════════════════
 const voteIssue = async (req, res) => {
+  // Démarre une transaction pour éviter les incohérences
   const transaction = await sequelize.transaction();
   
   try {
     const { id } = req.params;
 
-    // Check if issue exists
+    // --- Vérifie que le signalement existe ---
     const issue = await Issue.findByPk(id, { transaction });
     
     if (!issue) {
@@ -229,7 +254,7 @@ const voteIssue = async (req, res) => {
       return res.status(404).json({ message: 'Issue not found' });
     }
 
-    // Check if user already voted
+    // --- Vérifie si l'utilisateur a déjà voté ---
     const existingVote = await Vote.findOne({
       where: { userId: req.user.id, issueId: id },
       transaction
@@ -240,19 +265,19 @@ const voteIssue = async (req, res) => {
       return res.status(403).json({ message: 'You have already voted on this issue' });
     }
 
-    // Create vote
+    // --- Crée le vote ---
     await Vote.create({
       userId: req.user.id,
       issueId: id
     }, { transaction });
 
-    // Increment vote count
+    // --- Incrémente le compteur de votes ---
     await issue.increment('voteCount', { transaction });
-    await issue.reload({ transaction });
+    await issue.reload({ transaction });  // Recharge pour avoir la valeur à jour
 
     await transaction.commit();
 
-    // Emit WebSocket event
+    // --- ÉMET UN EVENT WEBSOCKET "issue:vote" (TEMPS RÉEL) ---
     const io = req.app.get('io');
     if (io) {
       io.emit('issue:vote', { issueId: id, voteCount: issue.voteCount });
@@ -270,13 +295,17 @@ const voteIssue = async (req, res) => {
   }
 };
 
-// Update issue status (admin only)
+// ═══════════════════════════════════════════════════════════════════════════
+// CHANGER LE STATUT (PATCH /api/issues/:id/status) - ADMIN UNIQUEMENT
+// Permet à un admin de changer le statut d'un signalement.
+// Émet un event WebSocket "issue:status" pour la mise à jour temps réel.
+// ═══════════════════════════════════════════════════════════════════════════
 const updateIssueStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
-    // Validate status
+    // --- Validation du statut ---
     const validStatuses = ['open', 'in_progress', 'resolved', 'closed'];
     if (!status || !validStatuses.includes(status)) {
       return res.status(400).json({ 
@@ -290,10 +319,10 @@ const updateIssueStatus = async (req, res) => {
       return res.status(404).json({ message: 'Issue not found' });
     }
 
-    // Update status
+    // --- Mise à jour du statut ---
     await issue.update({ status });
 
-    // Emit WebSocket event
+    // --- ÉMET UN EVENT WEBSOCKET "issue:status" (TEMPS RÉEL) ---
     const io = req.app.get('io');
     if (io) {
       io.emit('issue:status', { issueId: id, status });
@@ -310,7 +339,11 @@ const updateIssueStatus = async (req, res) => {
   }
 };
 
-// Delete issue (admin or owner)
+// ═══════════════════════════════════════════════════════════════════════════
+// SUPPRIMER UN SIGNALEMENT (DELETE /api/issues/:id)
+// Supprime un signalement. Autorisé pour l'auteur ou un admin.
+// Émet un event WebSocket "issue:delete" pour retirer le signalement en temps réel.
+// ═══════════════════════════════════════════════════════════════════════════
 const deleteIssue = async (req, res) => {
   try {
     const { id } = req.params;
@@ -321,14 +354,14 @@ const deleteIssue = async (req, res) => {
       return res.status(404).json({ message: 'Issue not found' });
     }
 
-    // Check permissions - admin or issue owner
+    // --- Vérification des permissions : admin OU auteur du signalement ---
     if (req.user.role !== 'admin' && issue.userId !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to delete this issue' });
     }
 
     await issue.destroy();
 
-    // Emit WebSocket event
+    // --- ÉMET UN EVENT WEBSOCKET "issue:delete" (TEMPS RÉEL) ---
     const io = req.app.get('io');
     if (io) {
       io.emit('issue:delete', { issueId: id });
@@ -342,6 +375,7 @@ const deleteIssue = async (req, res) => {
   }
 };
 
+// Export des fonctions du controller
 module.exports = {
   createIssue,
   getIssues,

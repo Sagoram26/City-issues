@@ -1,10 +1,20 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: controllers/user.controller.js
+// Gère les opérations sur les utilisateurs : profil public,
+// liste des signalements d'un user, gestion des rôles (admin).
+// ═══════════════════════════════════════════════════════════════════════════
+
 const { User, Issue } = require('../models');
 
-// Get user by ID (public profile)
+// ═══════════════════════════════════════════════════════════════════════════
+// PROFIL PUBLIC D'UN UTILISATEUR (GET /api/users/:id)
+// Retourne les infos publiques d'un user + nombre de signalements.
+// ═══════════════════════════════════════════════════════════════════════════
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Récupère seulement les champs publics (pas l'email)
     const user = await User.findByPk(id, {
       attributes: ['id', 'username', 'role', 'createdAt']
     });
@@ -13,7 +23,7 @@ const getUserById = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Get user's issues count
+    // Compte le nombre de signalements de cet utilisateur
     const issueCount = await Issue.count({ where: { userId: id } });
 
     res.json({
@@ -27,12 +37,16 @@ const getUserById = async (req, res) => {
   }
 };
 
-// Get user's issues
+// ═══════════════════════════════════════════════════════════════════════════
+// SIGNALEMENTS D'UN UTILISATEUR (GET /api/users/:id/issues)
+// Retourne la liste paginée des signalements créés par un utilisateur.
+// ═══════════════════════════════════════════════════════════════════════════
 const getUserIssues = async (req, res) => {
   try {
     const { id } = req.params;
     const { page = 1, limit = 10 } = req.query;
 
+    // Vérifie que l'utilisateur existe
     const user = await User.findByPk(id);
     
     if (!user) {
@@ -41,6 +55,7 @@ const getUserIssues = async (req, res) => {
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
+    // Liste paginée des signalements
     const { count, rows: issues } = await Issue.findAndCountAll({
       where: { userId: id },
       order: [['createdAt', 'DESC']],
@@ -64,7 +79,10 @@ const getUserIssues = async (req, res) => {
   }
 };
 
-// Admin: Get all users
+// ═══════════════════════════════════════════════════════════════════════════
+// ADMIN : LISTER TOUS LES UTILISATEURS (GET /api/users)
+// Réservé aux admins. Retourne la liste paginée de tous les users.
+// ═══════════════════════════════════════════════════════════════════════════
 const getAllUsers = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
@@ -93,12 +111,16 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// Admin: Update user role
+// ═══════════════════════════════════════════════════════════════════════════
+// ADMIN : CHANGER LE RÔLE D'UN UTILISATEUR (PATCH /api/users/:id/role)
+// Permet de promouvoir un user en admin ou de le rétrograder en citizen.
+// ═══════════════════════════════════════════════════════════════════════════
 const updateUserRole = async (req, res) => {
   try {
     const { id } = req.params;
     const { role } = req.body;
 
+    // Validation du rôle
     if (!role || !['citizen', 'admin'].includes(role)) {
       return res.status(400).json({ message: 'Invalid role' });
     }

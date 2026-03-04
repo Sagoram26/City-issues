@@ -1,48 +1,57 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: controllers/auth.controller.js
+// Gère l'authentification : inscription, connexion, profil utilisateur.
+// Utilise JWT (JSON Web Token) pour sécuriser les sessions.
+// ═══════════════════════════════════════════════════════════════════════════
+
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-// Generate JWT token
+// --- Génère un token JWT valide 7 jours par défaut ---
 const generateToken = (user) => {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { id: user.id, email: user.email, role: user.role }, // Payload
+    process.env.JWT_SECRET,                               // Clé secrète
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }    // Durée de validité
   );
 };
 
-// Register new user
+// ═══════════════════════════════════════════════════════════════════════════
+// INSCRIPTION (POST /api/auth/register)
+// Crée un nouveau compte utilisateur et retourne un token JWT.
+// ═══════════════════════════════════════════════════════════════════════════
 const register = async (req, res) => {
   try {
     const { email, password, username, role, profileData } = req.body;
 
-    // Validate required fields
+    // --- Validation des champs obligatoires ---
     if (!email || !password || !username) {
       return res.status(400).json({ 
         message: 'Email, password, and username are required' 
       });
     }
 
-    // Validate email format
+    // --- Vérification du format email avec regex ---
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: 'Invalid email format' });
     }
 
-    // Validate password length
+    // --- Mot de passe : minimum 6 caractères ---
     if (password.length < 6) {
       return res.status(400).json({ 
         message: 'Password must be at least 6 characters long' 
       });
     }
 
-    // Validate username length
+    // --- Username : entre 3 et 50 caractères ---
     if (username.length < 3 || username.length > 50) {
       return res.status(400).json({ 
         message: 'Username must be between 3 and 50 characters' 
       });
     }
 
-    // Check if user already exists
+    // --- Vérifie si l'email existe déjà ---
     const existingUser = await User.findOne({ 
       where: { email: email.toLowerCase() } 
     });
@@ -51,7 +60,7 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Email already registered' });
     }
 
-    // Check if username is taken
+    // --- Vérifie si le username est déjà pris ---
     const existingUsername = await User.findOne({ 
       where: { username } 
     });
@@ -60,35 +69,37 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Username already taken' });
     }
 
-    // Validate role - only allow 'citizen' for public registration
-    // Admin accounts should be created through a different process
+    // --- Sécurité : empêche de s'inscrire directement en admin ---
+    // Les admins doivent être créés via le script create-admin.js
     const userRole = (role === 'admin') ? 'citizen' : (role || 'citizen');
 
-    // Create user
+    // --- Création de l'utilisateur en base ---
     const user = await User.create({
       email: email.toLowerCase(),
-      password,
+      password,  // Hashé automatiquement par le hook beforeCreate
       username,
       role: userRole,
       profileData: profileData || {}
     });
 
-    // Generate token
+    // --- Génère le token et renvoie la réponse ---
     const token = generateToken(user);
 
     res.status(201).json({
       token,
-      user: user.toSafeObject()
+      user: user.toSafeObject()  // Sans le mot de passe
     });
 
   } catch (error) {
     console.error('Registration error:', error);
     
+    // Erreur de validation Sequelize
     if (error.name === 'SequelizeValidationError') {
       const messages = error.errors.map(e => e.message);
       return res.status(400).json({ message: messages.join(', ') });
     }
     
+    // Contrainte d'unicité violée (email ou username)
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(400).json({ message: 'Email or username already exists' });
     }
@@ -97,35 +108,39 @@ const register = async (req, res) => {
   }
 };
 
-// Login user
+// ═══════════════════════════════════════════════════════════════════════════
+// CONNEXION (POST /api/auth/login)
+// Vérifie les identifiants et retourne un token JWT si valides.
+// ═══════════════════════════════════════════════════════════════════════════
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate required fields
+    // --- Validation des champs ---
     if (!email || !password) {
       return res.status(400).json({ 
         message: 'Email and password are required' 
       });
     }
 
-    // Find user by email
+    // --- Recherche l'utilisateur par email ---
     const user = await User.findOne({ 
       where: { email: email.toLowerCase() } 
     });
 
+    // Message générique pour ne pas révéler si l'email existe
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Validate password
+    // --- Vérifie le mot de passe avec bcrypt ---
     const isValidPassword = await user.validatePassword(password);
     
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate token
+    // --- Génère le token et renvoie la réponse ---
     const token = generateToken(user);
 
     res.status(200).json({
@@ -139,9 +154,13 @@ const login = async (req, res) => {
   }
 };
 
-// Get current user profile
+// ═══════════════════════════════════════════════════════════════════════════
+// PROFIL UTILISATEUR (GET /api/auth/profile)
+// Retourne les infos du user connecté (nécessite un token valide).
+// ═══════════════════════════════════════════════════════════════════════════
 const getProfile = async (req, res) => {
   try {
+    // req.user est défini par le middleware verifyToken
     res.json(req.user.toSafeObject());
   } catch (error) {
     console.error('Get profile error:', error);
@@ -149,18 +168,22 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Update user profile
+// ═══════════════════════════════════════════════════════════════════════════
+// MISE À JOUR DU PROFIL (PATCH /api/auth/profile)
+// Permet de modifier son username ou ses données de profil.
+// ═══════════════════════════════════════════════════════════════════════════
 const updateProfile = async (req, res) => {
   try {
     const { username, profileData } = req.body;
     const updates = {};
 
+    // --- Mise à jour du username (vérifie l'unicité) ---
     if (username) {
-      // Check if username is taken by another user
       const existingUsername = await User.findOne({ 
         where: { username } 
       });
       
+      // Vérifie que ce n'est pas le même user
       if (existingUsername && existingUsername.id !== req.user.id) {
         return res.status(400).json({ message: 'Username already taken' });
       }
@@ -168,6 +191,7 @@ const updateProfile = async (req, res) => {
       updates.username = username;
     }
 
+    // --- Fusion des données de profil existantes + nouvelles ---
     if (profileData) {
       updates.profileData = { ...req.user.profileData, ...profileData };
     }
@@ -182,6 +206,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
+// Export des fonctions du controller
 module.exports = {
   register,
   login,

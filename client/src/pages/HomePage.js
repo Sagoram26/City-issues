@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/HomePage.js
+// Page d'accueil. Affiche la carte des signalements ou une grille
+// de cartes. Inclut filtres (statut, catégorie, recherche) et
+// écoute les événements Socket.IO pour MAJ temps réel.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
@@ -29,23 +36,26 @@ import { useSocket } from '../contexts/SocketContext';
 import issueService from '../services/issueService';
 
 const HomePage = () => {
-  const [issues, setIssues] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
+  // --- States ---
+  const [issues, setIssues] = useState([]);           // Liste des signalements
+  const [loading, setLoading] = useState(true);       // Chargement en cours
+  const [error, setError] = useState(null);           // Message d'erreur
+  const [filters, setFilters] = useState({            // Filtres actifs
     status: '',
     category: '',
     search: ''
   });
-  const [viewMode, setViewMode] = useState('map');
+  const [viewMode, setViewMode] = useState('map');    // 'map' ou 'cards'
   
   const { socket } = useSocket();
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  // --- Récupération des signalements depuis l'API ---
   const fetchIssues = useCallback(async () => {
     try {
       setLoading(true);
+      // Construction des paramètres de requête
       const params = {};
       if (filters.status) params.status = filters.status;
       if (filters.category) params.category = filters.category;
@@ -62,39 +72,46 @@ const HomePage = () => {
     }
   }, [filters]);
 
+  // Charger les signalements au montage et à chaque changement de filtre
   useEffect(() => {
     fetchIssues();
   }, [fetchIssues]);
 
-  // Listen for real-time updates
+  // --- ÉCOUTE DES ÉVÉNEMENTS SOCKET.IO (TEMPS RÉEL) ---
   useEffect(() => {
     if (!socket) return;
 
+    // Nouveau signalement créé par un autre utilisateur
     const handleNewIssue = (newIssue) => {
       setIssues(prev => [newIssue, ...prev]);
     };
 
+    // Mise à jour du nombre de votes
     const handleVoteUpdate = ({ issueId, voteCount }) => {
       setIssues(prev => prev.map(issue => 
         issue.id === issueId ? { ...issue, voteCount } : issue
       ));
     };
 
+    // Changement de statut
     const handleStatusUpdate = ({ issueId, status }) => {
       setIssues(prev => prev.map(issue => 
         issue.id === issueId ? { ...issue, status } : issue
       ));
     };
 
+    // Suppression d'un signalement
     const handleDeleteIssue = ({ issueId }) => {
       setIssues(prev => prev.filter(issue => issue.id !== issueId));
     };
 
+    // Abonnement aux événements
     socket.on('issue:new', handleNewIssue);
     socket.on('issue:vote', handleVoteUpdate);
     socket.on('issue:status', handleStatusUpdate);
     socket.on('issue:delete', handleDeleteIssue);
 
+    // Nettoyage à la destruction du composant
     return () => {
       socket.off('issue:new', handleNewIssue);
       socket.off('issue:vote', handleVoteUpdate);
@@ -103,6 +120,7 @@ const HomePage = () => {
     };
   }, [socket]);
 
+  // --- Gestion des filtres ---
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
@@ -113,6 +131,7 @@ const HomePage = () => {
     fetchIssues();
   };
 
+  // Options pour les selects de filtre
   const statusOptions = [
     { value: '', label: 'Tous les statuts' },
     { value: 'open', label: 'Ouvert' },
@@ -134,7 +153,7 @@ const HomePage = () => {
 
   return (
     <Box minH="calc(100vh - 64px)" bg="gray.50">
-      {/* Hero Section */}
+      {/* --- Section Hero avec titre --- */}
       <Box 
         bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
         py={12}

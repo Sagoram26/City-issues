@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/DashboardPage.js
+// Tableau de bord de l'utilisateur connecté. Affiche ses propres
+// signalements avec stats (total, ouverts, en cours, résolus).
+// Bouton pour créer un nouveau signalement.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
@@ -27,10 +34,11 @@ import api from '../services/api';
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const [issues, setIssues] = useState([]);
+  // --- States ---
+  const [issues, setIssues] = useState([]);     // Signalements de l'utilisateur
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState({          // Statistiques calculées
     total: 0,
     open: 0,
     inProgress: 0,
@@ -40,15 +48,18 @@ const DashboardPage = () => {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  // --- Chargement des signalements de l'utilisateur ---
   useEffect(() => {
     const fetchUserIssues = async () => {
       try {
         setLoading(true);
+        // Appel API: GET /users/:id/issues
         const response = await api.get(`/users/${user.id}/issues`);
         const userIssues = response.data.issues;
         
         setIssues(userIssues);
         
+        // Calcul des statistiques localement
         setStats({
           total: userIssues.length,
           open: userIssues.filter(i => i.status === 'open').length,
@@ -70,6 +81,7 @@ const DashboardPage = () => {
     }
   }, [user]);
 
+  // État de chargement
   if (loading) {
     return (
       <Center minH="calc(100vh - 64px)" bg="gray.50">
@@ -85,7 +97,7 @@ const DashboardPage = () => {
     <Box minH="calc(100vh - 64px)" bg="gray.50" py={8}>
       <Container maxW="1200px">
         <VStack spacing={6} align="stretch">
-          {/* Header */}
+          {/* --- En-tête avec bouton Signaler --- */}
           <HStack justify="space-between" align="center" flexWrap="wrap" gap={4}>
             <Box>
               <Heading size="lg" color="gray.800">Mon tableau de bord</Heading>

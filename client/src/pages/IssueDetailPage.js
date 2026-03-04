@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/IssueDetailPage.js
+// Page de détail d'un signalement. Affiche image, description, carte,
+// auteur, date. Permet de voter et (admin) de changer le statut ou
+// supprimer. Écoute Socket.IO pour MAJ temps réel du voteCount/status.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
@@ -39,23 +46,26 @@ import { useSocket } from '../contexts/SocketContext';
 import issueService from '../services/issueService';
 
 const IssueDetailPage = () => {
+  // --- Récupération de l'ID depuis l'URL ---
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin } = useAuth();
   const { socket } = useSocket();
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Pour le dialog de suppression
   const cancelRef = React.useRef();
   
-  const [issue, setIssue] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [voting, setVoting] = useState(false);
-  const [statusUpdating, setStatusUpdating] = useState(false);
+  // --- States ---
+  const [issue, setIssue] = useState(null);           // Détail du signalement
+  const [loading, setLoading] = useState(true);       // Chargement en cours
+  const [error, setError] = useState(null);           // Erreur
+  const [voting, setVoting] = useState(false);        // Vote en cours
+  const [statusUpdating, setStatusUpdating] = useState(false); // MAJ statut en cours
 
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  // Configuration des statuts
   const statusConfig = {
     open: { label: 'Ouvert', colorScheme: 'blue' },
     in_progress: { label: 'En cours', colorScheme: 'orange' },
@@ -63,6 +73,7 @@ const IssueDetailPage = () => {
     closed: { label: 'Fermé', colorScheme: 'gray' },
   };
 
+  // Configuration des catégories
   const categoryConfig = {
     road: { label: 'Voirie', icon: '🛣️' },
     lighting: { label: 'Éclairage', icon: '💡' },
@@ -75,6 +86,7 @@ const IssueDetailPage = () => {
 
   const SERVER_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
 
+  // --- Chargement du signalement ---
   useEffect(() => {
     const fetchIssue = async () => {
       try {
@@ -93,15 +105,18 @@ const IssueDetailPage = () => {
     fetchIssue();
   }, [id]);
 
+  // --- ÉCOUTE SOCKET.IO POUR MAJ TEMPS RÉEL ---
   useEffect(() => {
     if (!socket || !issue) return;
 
+    // Mise à jour du nombre de votes
     const handleVoteUpdate = ({ issueId, voteCount }) => {
       if (issueId === id) {
         setIssue(prev => ({ ...prev, voteCount }));
       }
     };
 
+    // Mise à jour du statut
     const handleStatusUpdate = ({ issueId, status }) => {
       if (issueId === id) {
         setIssue(prev => ({ ...prev, status }));
@@ -117,7 +132,9 @@ const IssueDetailPage = () => {
     };
   }, [socket, id, issue]);
 
+  // --- Fonction de vote ---
   const handleVote = async () => {
+    // Redirige vers login si non connecté
     if (!isAuthenticated) {
       navigate('/login', { state: { from: { pathname: `/issues/${id}` } } });
       return;

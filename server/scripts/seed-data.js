@@ -1,31 +1,37 @@
-/**
- * Script pour peupler la base de données avec des données de test
- * 
- * Usage: node scripts/seed-data.js
- */
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: scripts/seed-data.js
+// Script pour peupler la base de données avec des données de test.
+// Crée 1 admin + 2 citoyens + 5 signalements de démo.
+// Utilise findOrCreate pour éviter les doublons.
+// 
+// Usage: node scripts/seed-data.js
+// ═══════════════════════════════════════════════════════════════════════════
 
 require('dotenv').config();
 const { User, Issue, sequelize } = require('../models');
 
 const seedData = async () => {
   try {
+    // Connexion à la base de données
     await sequelize.authenticate();
     console.log('✅ Connexion à la base de données établie.\n');
 
-    // Créer des utilisateurs de test
+    // --- Création des utilisateurs de test ---
     console.log('📝 Création des utilisateurs...\n');
 
+    // Admin (rôle admin)
     const admin = await User.findOrCreate({
       where: { email: 'admin@ville.fr' },
       defaults: {
         email: 'admin@ville.fr',
-        password: 'admin123',
+        password: 'admin123',    // Sera hashé par le hook beforeCreate
         username: 'AdminVille',
         role: 'admin'
       }
     });
     console.log(`   Admin: admin@ville.fr / admin123 ${admin[1] ? '(créé)' : '(existe déjà)'}`);
 
+    // Citoyen 1 (rôle citizen)
     const citizen1 = await User.findOrCreate({
       where: { email: 'citoyen1@test.fr' },
       defaults: {
@@ -37,6 +43,7 @@ const seedData = async () => {
     });
     console.log(`   Citoyen 1: citoyen1@test.fr / test123 ${citizen1[1] ? '(créé)' : '(existe déjà)'}`);
 
+    // Citoyen 2
     const citizen2 = await User.findOrCreate({
       where: { email: 'citoyen2@test.fr' },
       defaults: {
@@ -48,9 +55,10 @@ const seedData = async () => {
     });
     console.log(`   Citoyen 2: citoyen2@test.fr / test123 ${citizen2[1] ? '(créé)' : '(existe déjà)'}`);
 
-    // Créer des signalements de test
+    // --- Création des signalements de test ---
     console.log('\n📝 Création des signalements de test...\n');
 
+    // Données des signalements (catégories variées, statuts variés)
     const issuesData = [
       {
         title: 'Nid de poule dangereux rue Victor Hugo',
@@ -91,7 +99,7 @@ const seedData = async () => {
         category: 'greenery',
         status: 'open',
         userId: citizen2[0].id,
-        voteCount: 5
+        voteCount: 5  // Signalement populaire
       },
       {
         title: 'Passage piéton effacé',
@@ -105,6 +113,7 @@ const seedData = async () => {
       }
     ];
 
+    // Insère chaque signalement (ou ignore si existe déjà)
     for (const issueData of issuesData) {
       const [issue, created] = await Issue.findOrCreate({
         where: { title: issueData.title },
@@ -113,6 +122,7 @@ const seedData = async () => {
       console.log(`   ${created ? '✅' : '⏭️'} ${issue.title.substring(0, 40)}...`);
     }
 
+    // Résumé final
     console.log('\n✅ Base de données peuplée avec succès !\n');
     console.log('═══════════════════════════════════════════════════════════');
     console.log('📋 COMPTES DE TEST');

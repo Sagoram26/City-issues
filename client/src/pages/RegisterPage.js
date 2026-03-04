@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/RegisterPage.js
+// Page d'inscription. Formulaire username/email/password avec
+// indicateur de force du mot de passe. Appel à AuthContext.register()
+// puis redirection vers l'accueil.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
@@ -27,6 +34,7 @@ import { EmailIcon, LockIcon, AtSignIcon } from '@chakra-ui/icons';
 import { useAuth } from '../contexts/AuthContext';
 
 const RegisterPage = () => {
+  // --- States du formulaire ---
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -36,7 +44,7 @@ const RegisterPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { register } = useAuth();
+  const { register } = useAuth(); // Fonction register du contexte
   const navigate = useNavigate();
   const cardBg = useColorModeValue('white', 'gray.800');
 
@@ -46,7 +54,10 @@ const RegisterPage = () => {
     setError('');
   };
 
-  // Password strength calculation
+  // --- Calcul de la force du mot de passe ---
+  // Retourne un pourcentage (0-100) basé sur:
+  // - Longueur >= 6 (+25), >= 8 (+25)
+  // - Contient majuscule (+25), chiffre (+25)
   const getPasswordStrength = (password) => {
     if (!password) return 0;
     let strength = 0;
@@ -58,11 +69,14 @@ const RegisterPage = () => {
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
+  // Couleur de la barre selon la force
   const strengthColor = passwordStrength <= 25 ? 'red' : passwordStrength <= 50 ? 'orange' : passwordStrength <= 75 ? 'yellow' : 'green';
 
+  // --- Soumission du formulaire ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validations
     if (!formData.username || !formData.email || !formData.password) {
       setError('Veuillez remplir tous les champs');
       return;
@@ -86,13 +100,14 @@ const RegisterPage = () => {
     try {
       setLoading(true);
       setError('');
+      // Appel API + auto-login
       await register({
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        role: 'citizen'
+        role: 'citizen' // Rôle par défaut
       });
-      navigate('/');
+      navigate('/'); // Redirige vers l'accueil
     } catch (err) {
       setError(err.response?.data?.message || 'Échec de l\'inscription');
     } finally {

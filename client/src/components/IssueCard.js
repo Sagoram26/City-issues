@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: components/IssueCard.js
+// Carte d'aperçu d'un signalement. Affiche la photo, le titre,
+// le statut, la catégorie et le nombre de votes. Cliquable pour
+// accéder au détail.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
@@ -17,6 +24,7 @@ import {
 import { TimeIcon } from '@chakra-ui/icons';
 
 const IssueCard = ({ issue }) => {
+  // --- Configuration des couleurs par statut ---
   const statusConfig = {
     open: { label: 'Ouvert', colorScheme: 'blue' },
     in_progress: { label: 'En cours', colorScheme: 'orange' },
@@ -24,6 +32,7 @@ const IssueCard = ({ issue }) => {
     closed: { label: 'Fermé', colorScheme: 'gray' },
   };
 
+  // --- Labels et icônes par catégorie ---
   const categoryLabels = {
     road: 'Voirie',
     lighting: 'Éclairage',
@@ -44,6 +53,7 @@ const IssueCard = ({ issue }) => {
     other: '📌',
   };
 
+  // --- Formatte la date en français ---
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -53,6 +63,7 @@ const IssueCard = ({ issue }) => {
     });
   };
 
+  // URL du serveur pour les images
   const SERVER_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
@@ -77,7 +88,7 @@ const IssueCard = ({ issue }) => {
         textDecoration: 'none',
       }}
     >
-      {/* Image Section */}
+      {/* --- Section image --- */}
       <Box position="relative" h="180px" overflow="hidden">
         {issue.photoUrl ? (
           <Image
@@ -102,7 +113,7 @@ const IssueCard = ({ issue }) => {
           </Flex>
         )}
         
-        {/* Category Badge Overlay */}
+        {/* Badge catégorie (superposé sur l'image) */}
         <Badge
           position="absolute"
           top={3}

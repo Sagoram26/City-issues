@@ -1,3 +1,12 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/AdminPage.js
+// Page d'administration (accès protégé aux admins). Deux onglets:
+// - "Issues": liste tous les signalements, permet de changer le
+//   statut ou supprimer (avec confirmation)
+// - "Users": liste tous les utilisateurs, permet de changer le rôle
+// Affiche des stats globales (total issues, ouverts, users, admins)
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
@@ -43,36 +52,41 @@ import api from '../services/api';
 import issueService from '../services/issueService';
 
 const AdminPage = () => {
-  const [issues, setIssues] = useState([]);
-  const [users, setUsers] = useState([]);
+  // --- States ---
+  const [issues, setIssues] = useState([]);     // Liste de tous les signalements
+  const [users, setUsers] = useState([]);       // Liste de tous les utilisateurs
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('issues');
-  const [stats, setStats] = useState({
+  const [activeTab, setActiveTab] = useState('issues'); // Onglet actif: 'issues' ou 'users'
+  const [stats, setStats] = useState({          // Statistiques globales
     totalIssues: 0,
     openIssues: 0,
     totalUsers: 0,
     admins: 0
   });
-  const [deleteId, setDeleteId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null); // ID du signalement à supprimer
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Dialog de confirmation
   const cancelRef = React.useRef();
   const toast = useToast();
 
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  // --- Chargement initial des données ---
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         
+        // Récupère tous les signalements
         const issuesResponse = await issueService.getIssues({ limit: 100 });
         setIssues(issuesResponse.issues);
         
+        // Récupère tous les utilisateurs (route admin)
         const usersResponse = await api.get('/users');
         setUsers(usersResponse.data.users);
         
+        // Calcule les statistiques
         setStats({
           totalIssues: issuesResponse.pagination.total,
           openIssues: issuesResponse.issues.filter(i => i.status === 'open').length,
@@ -96,6 +110,8 @@ const AdminPage = () => {
     fetchData();
   }, [toast]);
 
+  // --- Changement de statut d'un signalement ---
+  // Émet un événement WebSocket 'issue:status' côté backend
   const handleStatusChange = async (issueId, newStatus) => {
     try {
       await issueService.updateIssueStatus(issueId, newStatus);
@@ -117,6 +133,7 @@ const AdminPage = () => {
     }
   };
 
+  // --- Changement de rôle d'un utilisateur ---
   const handleRoleChange = async (userId, newRole) => {
     try {
       await api.patch(`/users/${userId}/role`, { role: newRole });
@@ -138,11 +155,14 @@ const AdminPage = () => {
     }
   };
 
+  // Ouvre le dialog de confirmation de suppression
   const confirmDelete = (issueId) => {
     setDeleteId(issueId);
     onOpen();
   };
 
+  // --- Suppression d'un signalement ---
+  // Émet un événement WebSocket 'issue:delete' côté backend
   const handleDeleteIssue = async () => {
     try {
       await issueService.deleteIssue(deleteId);

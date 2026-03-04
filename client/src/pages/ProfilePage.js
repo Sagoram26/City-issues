@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/ProfilePage.js
+// Page de profil utilisateur. Affiche les infos (username, email,
+// date d'inscription, rôle) et les statistiques (signalements,
+// résolus, votes reçus). Permet de modifier username/email.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -34,8 +41,9 @@ import api from '../services/api';
 
 const ProfilePage = () => {
   const { user, updateProfile } = useAuth();
+  // --- States ---
   const [userStats, setUserStats] = useState({ totalIssues: 0, resolvedIssues: 0, totalVotes: 0 });
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);  // Mode édition actif
   const [formData, setFormData] = useState({
     username: '',
     email: ''
@@ -46,6 +54,7 @@ const ProfilePage = () => {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  // Initialise le formulaire avec les données utilisateur
   useEffect(() => {
     if (user) {
       setFormData({
@@ -56,11 +65,13 @@ const ProfilePage = () => {
     }
   }, [user]);
 
+  // --- Récupère les statistiques de l'utilisateur ---
   const fetchUserStats = async () => {
     try {
       const response = await api.get('/issues/user/me');
       const issues = response.data;
       const resolvedIssues = issues.filter(issue => issue.status === 'resolved');
+      // Somme des votes sur tous les signalements de l'utilisateur
       const totalVotes = issues.reduce((sum, issue) => sum + (issue.voteCount || 0), 0);
       
       setUserStats({
@@ -78,13 +89,14 @@ const ProfilePage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // --- Soumission du formulaire de modification ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ type: '', text: '' });
 
     try {
-      await updateProfile(formData);
+      await updateProfile(formData); // Appel AuthContext.updateProfile
       setMessage({ type: 'success', text: 'Profil mis à jour avec succès!' });
       setIsEditing(false);
     } catch (error) {
@@ -97,6 +109,7 @@ const ProfilePage = () => {
     }
   };
 
+  // Annule l'édition et restaure les valeurs initiales
   const handleCancel = () => {
     setFormData({
       username: user.username || '',
@@ -106,6 +119,7 @@ const ProfilePage = () => {
     setMessage({ type: '', text: '' });
   };
 
+  // Formate une date en français
   const formatDate = (dateString) => {
     if (!dateString) return 'Non disponible';
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -127,13 +141,13 @@ const ProfilePage = () => {
     <Box minH="calc(100vh - 64px)" bg="gray.50" py={8}>
       <Container maxW="900px">
         <VStack spacing={6} align="stretch">
-          {/* Header */}
+          {/* --- En-tête --- */}
           <Box>
             <Heading size="lg" color="gray.800">Mon Profil</Heading>
             <Text color="gray.600">Gérez vos informations personnelles et visualisez vos statistiques</Text>
           </Box>
 
-          {/* Message Alert */}
+          {/* Message de succès/erreur */}
           {message.text && (
             <Alert 
               status={message.type === 'success' ? 'success' : 'error'} 
@@ -144,7 +158,7 @@ const ProfilePage = () => {
             </Alert>
           )}
 
-          {/* Profile Card */}
+          {/* --- Carte profil --- */}
           <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
             <CardHeader pb={0}>
               <Flex justify="space-between" align="center">

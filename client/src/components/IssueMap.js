@@ -1,10 +1,18 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: components/IssueMap.js
+// Composant carte Leaflet (OpenStreetMap) pour afficher les signalements.
+// Supporte deux modes :
+// - Affichage : montre les markers des issues avec popups
+// - Sélection : permet de cliquer pour choisir un emplacement
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Link } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icon issue in React-Leaflet
+// --- Correction d'un bug Leaflet avec les icônes par défaut dans React ---
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -12,17 +20,18 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 
-// Custom marker icons based on status
+// --- Crée une icône de marker colorée selon le statut ---
 const createCustomIcon = (status) => {
   const colors = {
-    open: '#f59e0b',      // warning yellow
-    in_progress: '#3b82f6', // primary blue
-    resolved: '#22c55e',   // success green
-    closed: '#6b7280'      // gray
+    open: '#f59e0b',      // Jaune : nouveau signalement
+    in_progress: '#3b82f6', // Bleu : en cours de traitement
+    resolved: '#22c55e',   // Vert : résolu
+    closed: '#6b7280'      // Gris : fermé
   };
   
   const color = colors[status] || colors.open;
   
+  // Crée un marker en forme de goutte coloré
   return L.divIcon({
     className: 'custom-marker',
     html: `
@@ -42,7 +51,7 @@ const createCustomIcon = (status) => {
   });
 };
 
-// Component to handle map center changes
+// --- Sous-composant : change le centre de la carte ---
 const ChangeView = ({ center, zoom }) => {
   const map = useMap();
   
@@ -55,7 +64,7 @@ const ChangeView = ({ center, zoom }) => {
   return null;
 };
 
-// Component to handle click events for location picking
+// --- Sous-composant : gère le clic pour sélectionner un emplacement ---
 const LocationPicker = ({ onLocationSelect }) => {
   const map = useMap();
   
@@ -79,15 +88,25 @@ const LocationPicker = ({ onLocationSelect }) => {
   return null;
 };
 
+// --- COMPOSANT PRINCIPAL : IssueMap ---
+// Props:
+// - issues: liste des signalements à afficher
+// - center: [lat, lng] centre de la carte (défaut: Paris)
+// - zoom: niveau de zoom (défaut: 12)
+// - height: hauteur de la carte
+// - onLocationSelect: callback pour le mode sélection (clic sur carte)
+// - selectedLocation: emplacement sélectionné (en mode sélection)
+// - showPopups: afficher les popups sur les markers
 const IssueMap = ({ 
   issues = [], 
-  center = [48.8566, 2.3522], // Default: Paris
+  center = [48.8566, 2.3522], // Défaut: Paris
   zoom = 12,
   height = '500px',
-  onLocationSelect = null,
+  onLocationSelect = null,      // Si défini, active le mode sélection
   selectedLocation = null,
   showPopups = true
 }) => {
+  // Labels pour les statuts (affichés dans les popups)
   const statusLabels = {
     open: 'Ouvert',
     in_progress: 'En cours',
@@ -103,16 +122,19 @@ const IssueMap = ({
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
       >
+        {/* Tuiles OpenStreetMap (fond de carte gratuit) */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
+        {/* Gère les changements de centre */}
         <ChangeView center={center} zoom={zoom} />
         
+        {/* Mode sélection : active le clic sur la carte */}
         {onLocationSelect && <LocationPicker onLocationSelect={onLocationSelect} />}
         
-        {/* Selected location marker for location picker */}
+        {/* Marker pour l'emplacement sélectionné (mode sélection) */}
         {selectedLocation && (
           <Marker 
             position={[selectedLocation.latitude, selectedLocation.longitude]}
@@ -130,7 +152,7 @@ const IssueMap = ({
           </Marker>
         )}
         
-        {/* Issue markers */}
+        {/* Markers des signalements existants */}
         {issues.map((issue) => (
           <Marker
             key={issue.id}

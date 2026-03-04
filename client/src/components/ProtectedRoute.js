@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: components/ProtectedRoute.js
+// Composant de protection des routes. Vérifie que l'utilisateur
+// est connecté (et optionnellement a le bon rôle) avant d'afficher
+// le contenu. Sinon redirige vers /login ou affiche "Accès refusé".
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -6,7 +13,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
 
-  // Show loading spinner while checking auth
+  // --- Pendant le chargement de l'auth, affiche un spinner ---
   if (loading) {
     return (
       <div className="loading-container">
@@ -15,12 +22,13 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     );
   }
 
-  // Redirect to login if not authenticated
+  // --- Si non connecté, redirige vers /login ---
+  // Sauvegarde l'URL actuelle pour y revenir après connexion
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check for required role
+  // --- Si un rôle spécifique est requis, vérifie que l'utilisateur l'a ---
   if (requiredRole && user?.role !== requiredRole) {
     return (
       <div className="container">
@@ -32,6 +40,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     );
   }
 
+  // --- Tout est ok, affiche le contenu protégé ---
   return children;
 };
 

@@ -1,3 +1,9 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/LoginPage.js
+// Page de connexion. Formulaire email/password, appel à AuthContext
+// pour login(), redirection vers la page d'origine après connexion.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState } from 'react';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -26,29 +32,34 @@ import { EmailIcon, LockIcon } from '@chakra-ui/icons';
 import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage = () => {
+  // --- States du formulaire ---
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');        // Message d'erreur
+  const [loading, setLoading] = useState(false); // Chargement en cours
   
-  const { login } = useAuth();
+  const { login } = useAuth();  // Fonction login du contexte
   const navigate = useNavigate();
   const location = useLocation();
   
+  // Page d'origine pour redirection après connexion
   const from = location.state?.from?.pathname || '/';
   const cardBg = useColorModeValue('white', 'gray.800');
 
+  // Gère les changements dans les champs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    setError('');
+    setError(''); // Efface l'erreur quand l'utilisateur tape
   };
 
+  // Soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validation basique
     if (!formData.email || !formData.password) {
       setError('Veuillez remplir tous les champs');
       return;
@@ -57,8 +68,8 @@ const LoginPage = () => {
     try {
       setLoading(true);
       setError('');
-      await login(formData.email, formData.password);
-      navigate(from, { replace: true });
+      await login(formData.email, formData.password); // Appel API + stockage token
+      navigate(from, { replace: true });              // Redirige vers la page d'origine
     } catch (err) {
       setError(err.response?.data?.message || 'Échec de la connexion');
     } finally {
@@ -70,7 +81,7 @@ const LoginPage = () => {
     <Box minH="calc(100vh - 64px)" py={12} px={4} bg="gray.50">
       <Container maxW="md">
         <Stack spacing={8} align="center">
-          {/* Header */}
+          {/* --- En-tête --- */}
           <Stack spacing={2} textAlign="center">
             <Heading fontSize="3xl" fontWeight="bold" color="gray.800">
               Bon retour parmi nous
@@ -80,9 +91,10 @@ const LoginPage = () => {
             </Text>
           </Stack>
 
-          {/* Card */}
+          {/* --- Carte formulaire --- */}
           <Card w="full" bg={cardBg} shadow="xl" borderRadius="2xl">
             <CardBody p={8}>
+              {/* Affichage de l'erreur */}
               {error && (
                 <Alert status="error" borderRadius="lg" mb={6}>
                   <AlertIcon />
@@ -92,6 +104,7 @@ const LoginPage = () => {
 
               <form onSubmit={handleSubmit}>
                 <Stack spacing={5}>
+                  {/* Champ email */}
                   <FormControl isRequired>
                     <FormLabel fontWeight="500" color="gray.700">
                       Adresse email
@@ -113,6 +126,7 @@ const LoginPage = () => {
                     </InputGroup>
                   </FormControl>
 
+                  {/* Champ mot de passe */}
                   <FormControl isRequired>
                     <FormLabel fontWeight="500" color="gray.700">
                       Mot de passe
@@ -134,6 +148,7 @@ const LoginPage = () => {
                     </InputGroup>
                   </FormControl>
 
+                  {/* Bouton de connexion */}
                   <Button
                     type="submit"
                     colorScheme="blue"
@@ -151,6 +166,7 @@ const LoginPage = () => {
                 </Stack>
               </form>
 
+              {/* Séparateur */}
               <HStack my={6}>
                 <Divider />
                 <Text fontSize="sm" color="gray.500" whiteSpace="nowrap" px={2}>
@@ -159,6 +175,7 @@ const LoginPage = () => {
                 <Divider />
               </HStack>
 
+              {/* Lien vers inscription */}
               <Text textAlign="center" color="gray.600">
                 Pas encore de compte ?{' '}
                 <Link
@@ -174,7 +191,7 @@ const LoginPage = () => {
             </CardBody>
           </Card>
 
-          {/* Footer */}
+          {/* Pied de page */}
           <Text fontSize="sm" color="gray.500" textAlign="center">
             En vous connectant, vous acceptez nos conditions d'utilisation
           </Text>

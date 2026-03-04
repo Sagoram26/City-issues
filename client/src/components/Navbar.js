@@ -1,3 +1,10 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: components/Navbar.js
+// Barre de navigation principale. Affiche le logo, les liens de
+// navigation (différents selon le rôle), et le menu utilisateur.
+// Responsive avec un drawer pour mobile.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React from 'react';
 import { Link as RouterLink, NavLink, useNavigate } from 'react-router-dom';
 import {
@@ -27,6 +34,8 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { useAuth } from '../contexts/AuthContext';
 
+// --- Composant de lien de navigation (desktop) ---
+// Affiche un style différent si le lien est actif
 const NavItem = ({ to, children, end = false }) => {
   return (
     <NavLink to={to} end={end}>
@@ -48,20 +57,23 @@ const NavItem = ({ to, children, end = false }) => {
   );
 };
 
+// --- Composant principal Navbar ---
 const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Pour le drawer mobile
   
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  // Déconnexion et redirection vers l'accueil
   const handleLogout = () => {
     logout();
     navigate('/');
     onClose();
   };
 
+  // --- Composant de lien de navigation (mobile) ---
   const MobileNavItem = ({ to, children, onClick }) => (
     <NavLink to={to} onClick={onClick}>
       {({ isActive }) => (
@@ -100,7 +112,7 @@ const Navbar = () => {
         align="center"
         justify="space-between"
       >
-        {/* Logo */}
+        {/* --- Logo --- */}
         <RouterLink to="/">
           <HStack spacing={2} cursor="pointer">
             <Text fontSize="2xl">🏙️</Text>
@@ -115,7 +127,7 @@ const Navbar = () => {
           </HStack>
         </RouterLink>
 
-        {/* Desktop Navigation */}
+        {/* --- Navigation desktop (cachée sur mobile) --- */}
         <HStack spacing={1} display={{ base: 'none', md: 'flex' }}>
           <NavItem to="/" end>Carte</NavItem>
           {isAuthenticated && (
@@ -134,7 +146,7 @@ const Navbar = () => {
           )}
         </HStack>
 
-        {/* Desktop Auth */}
+        {/* --- Menu utilisateur desktop --- */}
         <HStack spacing={3} display={{ base: 'none', md: 'flex' }}>
           {isAuthenticated ? (
             <Menu>

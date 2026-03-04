@@ -1,3 +1,12 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// FICHIER: pages/ReportIssuePage.js
+// Page de création d'un nouveau signalement. Formulaire complet:
+// - Titre, description, catégorie
+// - Sélection de localisation sur la carte (IssueMap)
+// - Upload de photo (validation type/taille, preview)
+// - Soumission via issueService.createIssue() avec FormData
+// ═══════════════════════════════════════════════════════════════════════════
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -28,16 +37,17 @@ import IssueMap from '../components/IssueMap';
 import issueService from '../services/issueService';
 
 const ReportIssuePage = () => {
+  // --- States du formulaire ---
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: 'other',
-    latitude: null,
+    latitude: null,      // Sélectionné sur la carte
     longitude: null,
-    address: ''
+    address: ''          // Optionnel
   });
-  const [photo, setPhoto] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(null);
+  const [photo, setPhoto] = useState(null);         // Fichier à uploader
+  const [photoPreview, setPhotoPreview] = useState(null); // Preview base64
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -45,6 +55,7 @@ const ReportIssuePage = () => {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  // Options de catégorie avec icônes
   const categoryOptions = [
     { value: 'road', label: '🛣️ Voirie', description: 'Nids de poule, trottoirs...' },
     { value: 'lighting', label: '💡 Éclairage', description: 'Lampadaires défaillants...' },
@@ -55,21 +66,25 @@ const ReportIssuePage = () => {
     { value: 'other', label: '📌 Autre', description: 'Autre problème...' },
   ];
 
+  // Met à jour les champs du formulaire
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     setError('');
   };
 
+  // --- Gestion de l'upload de photo ---
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Vérifie le type MIME (images uniquement)
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
         setError('Format de fichier non supporté. Utilisez JPEG, PNG, GIF ou WebP.');
         return;
       }
       
+      // Vérifie la taille (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('Le fichier est trop volumineux. Taille maximum: 5MB');
         return;
@@ -78,6 +93,7 @@ const ReportIssuePage = () => {
       setPhoto(file);
       setError('');
       
+      // Génère un preview base64 pour l'affichage
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result);
@@ -86,6 +102,7 @@ const ReportIssuePage = () => {
     }
   };
 
+  // Callback quand l'utilisateur clique sur la carte
   const handleLocationSelect = (location) => {
     setFormData(prev => ({
       ...prev,
@@ -94,9 +111,11 @@ const ReportIssuePage = () => {
     }));
   };
 
+  // --- Soumission du formulaire ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validations
     if (!formData.title || formData.title.length < 5) {
       setError('Le titre doit contenir au moins 5 caractères');
       return;
@@ -116,6 +135,7 @@ const ReportIssuePage = () => {
       setLoading(true);
       setError('');
       
+      // Prépare les données (y compris la photo)
       const issueData = {
         title: formData.title,
         description: formData.description,
@@ -123,11 +143,11 @@ const ReportIssuePage = () => {
         latitude: formData.latitude,
         longitude: formData.longitude,
         address: formData.address,
-        photo: photo
+        photo: photo  // Le service convertira en FormData
       };
       
       const newIssue = await issueService.createIssue(issueData);
-      navigate(`/issues/${newIssue.id}`);
+      navigate(`/issues/${newIssue.id}`); // Redirige vers le détail
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur lors de la création du signalement');
     } finally {
