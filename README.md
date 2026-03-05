@@ -1,26 +1,26 @@
-# City Issues 🏙️ - Suivi Collaboratif des Problèmes de la Ville
+# City Issues - Suivi Collaboratif des Problèmes de la Ville
 
 Une application web moderne pour signaler, suivre et voter sur les problèmes urbains de votre ville. Construite avec **React**, **Node.js**, **PostgreSQL** et **Chakra UI**.
 
-## 🎯 Fonctionnalités
+## Fonctionnalités
 
-- 📢 **Signalement d'issues** : Créez des signalements avec photos, localisation et catégorie
-- ⚡ **Temps réel (WebSocket)** : Mises à jour instantanées avec Socket.IO
-- 🔔 **Notifications UI** : Toasts, badges et animations pour les nouveaux signalements
-- 👍 **Système de votes** : Votez pour les problèmes les plus importants
-- 🔍 **Filtrage avancé** : Par statut, catégorie et recherche texte
-- 🗺️ **Carte interactive** : Visualisez les signalements sur une carte Leaflet
-- 👥 **Rôles utilisateurs** : Citoyen, modérateur, administrateur
-- 📱 **Responsive design** : Optimisé pour desktop et mobile
+- **Signalement d'issues** : Créez des signalements avec photos, localisation et catégorie
+- **Temps réel (WebSocket)** : Mises à jour instantanées avec Socket.IO
+- **Notifications UI** : Toasts, badges et animations pour les nouveaux signalements
+- **Système de votes** : Votez pour les problèmes les plus importants
+- **Filtrage avancé** : Par statut, catégorie et recherche texte
+- **Carte interactive** : Visualisez les signalements sur une carte Leaflet
+- **Rôles utilisateurs** : Citoyen, modérateur, administrateur
+- **Responsive design** : Optimisé pour desktop et mobile
 
-## 📋 Prérequis
+## Prérequis
 
 - **Node.js** ≥ 16.x
 - **npm** ou **yarn**
 - **PostgreSQL** ≥ 12
 - **Git**
 
-## 🚀 Installation rapide
+## Installation rapide
 
 ```bash
 # 1. Cloner le projet
@@ -47,7 +47,7 @@ npm start
 
 L'application ouvrira automatiquement sur `http://localhost:3000`
 
-## 📦 Dépendances
+## Dépendances
 
 ### Frontend (React 18)
 
@@ -77,7 +77,7 @@ L'application ouvrira automatiquement sur `http://localhost:3000`
 | `cors` | ^2.x | CORS middleware |
 | `dotenv` | ^16.x | Variables d'environnement |
 
-## 🔐 Configuration - Variables d'environnement
+## Configuration - Variables d'environnement
 
 ### Serveur (`.env`)
 
@@ -107,15 +107,28 @@ MAX_FILE_SIZE=5242880
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
-## 👤 Comptes de test
+## Comptes de test
 
-| Email | Mot de passe | Rôle |
-|-------|--------------|------|
-| admin@ville.fr | admin123 | Administrateur |
-| citoyen1@test.fr | test123 | Citoyen |
-| citoyen2@test.fr | test123 | Citoyen |
+### Créer les comptes de test
 
-## 🔄 Temps Réel - Socket.IO
+Pour peupler la base de données avec des comptes et signalements de test:
+
+```bash
+cd server
+node scripts/seed-data.js
+```
+
+### Identifiants
+
+| Email | Mot de passe | Rôle | ID |
+|-------|--------------|------|-----|
+| admin@ville.fr | admin123 | Administrateur | 1 |
+| citoyen1@test.fr | test123 | Citoyen | 2 |
+| citoyen2@test.fr | test123 | Citoyen | 3 |
+
+> **Note:** Les IDs sont attribués par PostgreSQL (auto-increment). Après le seed, les IDs typiques sont 1 (admin), 2 et 3 (citoyens), mais peuvent varier si la table existe déjà.
+
+## Temps Réel - Socket.IO
 
 L'application utilise **Socket.IO** pour les mises à jour instantanées entre tous les clients.
 
@@ -147,30 +160,30 @@ socket.emit('issue:vote', { issueId })
 socket.emit('issue:status', { issueId, status: 'resolved' })
 ```
 
-## 🎨 Notifications UI
+## Notifications UI
 
-### 🔔 Toast Notifications (Chakra UI)
+### Toast Notifications (Chakra UI)
 
 Affichent des messages temporaires en bas à droite:
 
 ```
-📢 Nouveau signalement!
+Nouveau signalement!
 "Nid de poule rue de la Paix" vient d'être signalé
 
-👍 Vote reçu!
+Vote reçu!
 Un nouveau vote a été ajouté
 
-📋 Statut mis à jour
+Statut mis à jour
 Le signalement est maintenant "Résolu"
 
-🗑️ Signalement supprimé
+Signalement supprimé
 Le signalement a été supprimé
 ```
 
-### ✨ Badges & Animations
+### Badges & Animations
 
 **Badge "NEW"** sur les cartes nouvelles:
-- Affiche `✨ Nouveau` en vert
+- Affiche "Nouveau" en vert
 - Border clignotante
 - Animation de pulsation (`pulse-border`)
 - S'efface après 3 secondes
@@ -180,7 +193,7 @@ Le signalement a été supprimé
 - Animation `notification-spin` au chargement
 - Badge rouge clignotant
 
-### 🎬 Animations CSS disponibles
+### Animations CSS disponibles
 
 | Animation | Utilisation | Durée |
 |-----------|-------------|-------|
@@ -192,7 +205,7 @@ Le signalement a été supprimé
 | `highlight` | Surlignage de mises à jour | 1s |
 | `toast-slide-in` | Animation des toasts | 0.3s |
 
-## 📂 Structure du projet
+## Structure du projet
 
 ```
 city-issue-tracker/
@@ -260,7 +273,7 @@ city-issue-tracker/
 │   │   ├── error.js                    # Gestion d'erreurs
 │   │   └── validation.js               # Validation données
 │   │
-│   ├── uploads/                         # 📸 Dossier des photos
+│   ├── uploads/                         # Dossier des photos
 │   │
 │   ├── .env.example                    # Modèle variables env
 │   ├── server.js                       # Point d'entrée
@@ -271,26 +284,26 @@ city-issue-tracker/
 
 ```
 
-## 🧪 Scripts disponibles
+## Scripts disponibles
 
 ### Frontend (`client/`)
 
 ```bash
-npm start           # 🔥 Démarrer en développement (port 3000)
-npm run build       # 📦 Build de production
-npm test            # 🧪 Lancer les tests
-npm run eject       # ⚠️ Éjecter config (irreversible)
+npm start           # Démarrer en développement (port 3000)
+npm run build       # Build de production
+npm test            # Lancer les tests
+npm run eject       # Éjecter config (irreversible)
 ```
 
 ### Backend (`server/`)
 
 ```bash
-npm run dev         # 🔥 Démarrage avec nodemon (live reload)
-npm start           # ⏱️ Démarrage production
-npm run migrate     # 🗄️ Migrations Sequelize
+npm run dev         # Démarrage avec nodemon (live reload)
+npm start           # Démarrage production
+npm run migrate     # Migrations Sequelize
 ```
 
-## 🌐 API Endpoints
+## API Endpoints
 
 ### Auth
 - `POST /api/auth/register` - Inscription
@@ -312,9 +325,9 @@ npm run migrate     # 🗄️ Migrations Sequelize
 - `GET /api/users` - Lister
 - `PATCH /api/users/:id/role` - Changer rôle
 
-## 🐛 Dépannage
+## Dépannage
 
-### ❌ `Error: connect ECONNREFUSED localhost:5432`
+### `Error: connect ECONNREFUSED localhost:5432`
 PostgreSQL n'est pas lancé.
 ```bash
 # Démarrer PostgreSQL
@@ -323,7 +336,7 @@ sudo service postgresql start   # Linux
 pg_ctl start                    # Manuel
 ```
 
-### ❌ `Error: Port 3000 already in use`
+### `Error: Port 3000 already in use`
 Un autre processus utilise le port.
 ```bash
 # Tuer le processus
@@ -331,17 +344,17 @@ lsof -i :3000
 kill -9 <PID>
 ```
 
-### ❌ `Module not found`
+### `Module not found`
 Les dépendances ne sont pas installées.
 ```bash
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-### ❌ `CORS Error`
+### `CORS Error`
 Vérifier que `CORS_ORIGIN` dans `.env` serveur correspond à l'URL client.
 
-## 🚀 Déploiement
+## Déploiement
 
 ### Vercel (Frontend)
 ```bash
@@ -360,15 +373,15 @@ git push heroku main
 docker-compose up -d
 ```
 
-## 📄 Licence
+## Licence
 
 MIT
 
-## 👨‍💻 Auteur
+## Auteur
 
 Créé par **Sagora** pour le projet universitaire "Suivi Collaboratif des Problèmes de la Ville" (Université, 2024-2026).
 
-## 🔗 Liens utiles
+## Liens utiles
 
 - **Repository** : https://github.com/Sagoram26/City-issues
 - **Issues** : https://github.com/Sagoram26/City-issues/issues

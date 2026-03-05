@@ -29,7 +29,6 @@ import {
   DrawerCloseButton,
   VStack,
   Badge,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { useAuth } from '../contexts/AuthContext';
@@ -45,9 +44,9 @@ const NavItem = ({ to, children, end = false }) => {
           variant="ghost"
           size="sm"
           fontWeight={isActive ? '600' : '500'}
-          color={isActive ? 'brand.600' : 'gray.600'}
-          bg={isActive ? 'brand.50' : 'transparent'}
-          _hover={{ bg: 'gray.100', color: 'gray.800' }}
+          color={isActive ? '#00B8F5' : 'whiteAlpha.800'}
+          bg={isActive ? 'rgba(90, 110, 255, 0.2)' : 'transparent'}
+          _hover={{ bg: 'rgba(90, 110, 255, 0.3)', color: 'white' }}
           borderRadius="lg"
         >
           {children}
@@ -62,9 +61,6 @@ const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure(); // Pour le drawer mobile
-  
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   // Déconnexion et redirection vers l'accueil
   const handleLogout = () => {
@@ -83,9 +79,9 @@ const Navbar = () => {
           w="full"
           justifyContent="flex-start"
           fontWeight={isActive ? '600' : '500'}
-          color={isActive ? 'brand.600' : 'gray.700'}
-          bg={isActive ? 'brand.50' : 'transparent'}
-          _hover={{ bg: 'gray.100' }}
+          color={isActive ? '#00B8F5' : 'whiteAlpha.800'}
+          bg={isActive ? 'rgba(90, 110, 255, 0.2)' : 'transparent'}
+          _hover={{ bg: 'rgba(90, 110, 255, 0.3)', color: 'white' }}
         >
           {children}
         </Button>
@@ -99,10 +95,11 @@ const Navbar = () => {
       position="sticky"
       top="0"
       zIndex="1000"
-      bg={bgColor}
+      bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 100%)"
       borderBottom="1px"
-      borderColor={borderColor}
-      shadow="sm"
+      borderColor="rgba(90, 110, 255, 0.3)"
+      shadow="lg"
+      backdropFilter="blur(10px)"
     >
       <Flex
         maxW="1400px"
@@ -119,7 +116,8 @@ const Navbar = () => {
             <Text
               fontWeight="bold"
               fontSize="lg"
-              color="gray.800"
+              bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+              bgClip="text"
               display={{ base: 'none', sm: 'block' }}
             >
               CityTracker
@@ -161,20 +159,38 @@ const Navbar = () => {
                   <Avatar
                     size="sm"
                     name={user?.username}
-                    bg="brand.500"
+                    bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
                     color="white"
                   />
-                  <Text fontWeight="500" color="gray.700">
+                  <Text fontWeight="500" color="white">
                     {user?.username}
                   </Text>
                 </HStack>
               </MenuButton>
-              <MenuList shadow="lg" borderRadius="xl" py={2}>
+              <MenuList 
+                shadow="2xl" 
+                borderRadius="xl" 
+                py={1}
+                border="1px"
+                borderColor="rgba(90, 110, 255, 0.5)"
+                backdropFilter="blur(10px)"
+                sx={{
+                  backgroundColor: '#0F1419 !important',
+                  '& [role="menuitem"]': {
+                    backgroundColor: 'transparent !important',
+                    color: '#E0E7FF !important',
+                  },
+                  '& [role="menuitem"]:hover': {
+                    backgroundColor: 'rgba(90, 110, 255, 0.3) !important',
+                    color: '#00B8F5 !important',
+                  },
+                }}
+              >
                 <MenuItem
                   as={RouterLink}
                   to="/profile"
                   fontWeight="500"
-                  _hover={{ bg: 'gray.50' }}
+                  fontSize="sm"
                 >
                   Mon profil
                 </MenuItem>
@@ -182,16 +198,22 @@ const Navbar = () => {
                   as={RouterLink}
                   to="/dashboard"
                   fontWeight="500"
-                  _hover={{ bg: 'gray.50' }}
+                  fontSize="sm"
                 >
                   Mes signalements
                 </MenuItem>
-                <MenuDivider />
+                <MenuDivider m={1} borderColor="rgba(90, 110, 255, 0.3)" />
                 <MenuItem
                   onClick={handleLogout}
-                  color="red.500"
                   fontWeight="500"
-                  _hover={{ bg: 'red.50' }}
+                  fontSize="sm"
+                  sx={{
+                    color: '#FF8888 !important',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 107, 107, 0.2) !important',
+                      color: '#FFB0B0 !important',
+                    },
+                  }}
                 >
                   Déconnexion
                 </MenuItem>
@@ -202,18 +224,30 @@ const Navbar = () => {
               <Button
                 as={RouterLink}
                 to="/login"
-                variant="ghost"
+                bgGradient="linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)"
+                color="white"
                 size="sm"
-                fontWeight="500"
+                fontWeight="600"
+                borderRadius="lg"
+                _hover={{
+                  bgGradient: "linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)",
+                  boxShadow: "0 4px 16px rgba(90, 110, 255, 0.3)"
+                }}
               >
                 Connexion
               </Button>
               <Button
                 as={RouterLink}
                 to="/register"
-                colorScheme="brand"
+                bgGradient="linear-gradient(135deg, #00B8F5 0%, #00D4FF 100%)"
+                color="white"
                 size="sm"
                 fontWeight="600"
+                borderRadius="lg"
+                _hover={{
+                  bgGradient: "linear-gradient(135deg, #25C4FF 0%, #5A6EFF 100%)",
+                  boxShadow: "0 4px 16px rgba(0, 184, 245, 0.3)"
+                }}
               >
                 S'inscrire
               </Button>
@@ -228,17 +262,25 @@ const Navbar = () => {
           variant="ghost"
           aria-label="Menu"
           icon={<HamburgerIcon />}
+          color="white"
+          _hover={{ bg: 'rgba(90, 110, 255, 0.3)' }}
         />
 
         {/* Mobile Drawer */}
         <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
           <DrawerOverlay />
-          <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerHeader borderBottomWidth="1px">
+          <DrawerContent bg="linear-gradient(180deg, #0F1419 0%, #1a1f2e 100%)">
+            <DrawerCloseButton color="white" />
+            <DrawerHeader borderBottomWidth="1px" borderColor="rgba(90, 110, 255, 0.3)">
               <HStack spacing={2}>
                 <Text fontSize="xl">🏙️</Text>
-                <Text fontWeight="bold">CityTracker</Text>
+                <Text 
+                  fontWeight="bold"
+                  bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+                  bgClip="text"
+                >
+                  CityTracker
+                </Text>
               </HStack>
             </DrawerHeader>
             <DrawerBody>
@@ -255,7 +297,7 @@ const Navbar = () => {
                         Administration
                       </MobileNavItem>
                     )}
-                    <Box pt={4} borderTopWidth="1px">
+                    <Box pt={4} borderTopWidth="1px" borderColor="rgba(90, 110, 255, 0.3)">
                       <Button
                         w="full"
                         variant="outline"
@@ -272,7 +314,11 @@ const Navbar = () => {
                       as={RouterLink}
                       to="/login"
                       w="full"
-                      variant="outline"
+                      bgGradient="linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)"
+                      color="white"
+                      _hover={{
+                        bgGradient: "linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)"
+                      }}
                       onClick={onClose}
                     >
                       Connexion
@@ -281,7 +327,11 @@ const Navbar = () => {
                       as={RouterLink}
                       to="/register"
                       w="full"
-                      colorScheme="brand"
+                      bgGradient="linear-gradient(135deg, #00B8F5 0%, #00D4FF 100%)"
+                      color="white"
+                      _hover={{
+                        bgGradient: "linear-gradient(135deg, #25C4FF 0%, #5A6EFF 100%)"
+                      }}
                       onClick={onClose}
                     >
                       S'inscrire

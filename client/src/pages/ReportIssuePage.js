@@ -156,15 +156,20 @@ const ReportIssuePage = () => {
   };
 
   return (
-    <Box minH="calc(100vh - 64px)" bg="gray.50" py={8}>
+    <Box minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)" py={8}>
       <Container maxW="1200px">
         <VStack spacing={6} align="stretch">
           {/* Header */}
           <Box textAlign="center" mb={4}>
-            <Heading size="lg" color="gray.800" mb={2}>
+            <Heading 
+              size="lg" 
+              bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+              bgClip="text"
+              mb={2}
+            >
               Signaler un problème
             </Heading>
-            <Text color="gray.600" maxW="600px" mx="auto">
+            <Text color="whiteAlpha.700" maxW="600px" mx="auto">
               Aidez à améliorer votre quartier en signalant les problèmes que vous observez. 
               Votre signalement sera visible par la communauté et les autorités.
             </Text>
@@ -172,7 +177,12 @@ const ReportIssuePage = () => {
 
           {/* Error Alert */}
           {error && (
-            <Alert status="error" borderRadius="lg">
+            <Alert 
+              status="error" 
+              borderRadius="lg"
+              bg="rgba(230, 0, 0, 0.1)"
+              borderColor="rgba(230, 0, 0, 0.3)"
+            >
               <AlertIcon />
               {error}
             </Alert>
@@ -180,10 +190,17 @@ const ReportIssuePage = () => {
 
           <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6}>
             {/* Map Section */}
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(90, 110, 255, 0.2)"
+            >
               <CardHeader pb={2}>
-                <Heading size="md">📍 Localisation</Heading>
-                <Text fontSize="sm" color="gray.500" mt={1}>
+                <Heading size="md" color="white">📍 Localisation</Heading>
+                <Text fontSize="sm" color="whiteAlpha.600" mt={1}>
                   Cliquez sur la carte pour indiquer l'emplacement du problème
                 </Text>
               </CardHeader>
@@ -217,15 +234,22 @@ const ReportIssuePage = () => {
             </Card>
 
             {/* Form Section */}
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(90, 110, 255, 0.2)"
+            >
               <CardHeader pb={2}>
-                <Heading size="md">📝 Détails du signalement</Heading>
+                <Heading size="md" color="white">📝 Détails du signalement</Heading>
               </CardHeader>
               <CardBody pt={0}>
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={5} align="stretch">
                     <FormControl isRequired>
-                      <FormLabel fontWeight="500">Titre</FormLabel>
+                      <FormLabel fontWeight="500" color="white">Titre</FormLabel>
                       <Input
                         name="title"
                         value={formData.title}
@@ -235,12 +259,18 @@ const ReportIssuePage = () => {
                         borderRadius="lg"
                         isDisabled={loading}
                         maxLength={200}
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                        _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 3px rgba(90, 110, 255, 0.3)" }}
+                        _placeholder={{ color: 'whiteAlpha.500' }}
                       />
-                      <FormHelperText>Décrivez le problème en quelques mots</FormHelperText>
+                      <FormHelperText color="whiteAlpha.600">Décrivez le problème en quelques mots</FormHelperText>
                     </FormControl>
 
                     <FormControl isRequired>
-                      <FormLabel fontWeight="500">Catégorie</FormLabel>
+                      <FormLabel fontWeight="500" color="white">Catégorie</FormLabel>
                       <Select
                         name="category"
                         value={formData.category}
@@ -248,6 +278,17 @@ const ReportIssuePage = () => {
                         size="lg"
                         borderRadius="lg"
                         isDisabled={loading}
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                        _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 3px rgba(90, 110, 255, 0.3)" }}
+                        sx={{
+                          '& option': {
+                            bg: '#1a1f2e',
+                            color: 'white',
+                          }
+                        }}
                       >
                         {categoryOptions.map(opt => (
                           <option key={opt.value} value={opt.value}>
@@ -258,7 +299,7 @@ const ReportIssuePage = () => {
                     </FormControl>
 
                     <FormControl isRequired>
-                      <FormLabel fontWeight="500">Description</FormLabel>
+                      <FormLabel fontWeight="500" color="white">Description</FormLabel>
                       <Textarea
                         name="description"
                         value={formData.description}
@@ -269,12 +310,18 @@ const ReportIssuePage = () => {
                         minH="120px"
                         isDisabled={loading}
                         maxLength={5000}
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                        _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 3px rgba(90, 110, 255, 0.3)" }}
+                        _placeholder={{ color: 'whiteAlpha.500' }}
                       />
-                      <FormHelperText>Minimum 10 caractères</FormHelperText>
+                      <FormHelperText color="whiteAlpha.600">Minimum 10 caractères</FormHelperText>
                     </FormControl>
 
                     <FormControl>
-                      <FormLabel fontWeight="500">Adresse (optionnel)</FormLabel>
+                      <FormLabel fontWeight="500" color="white">Adresse (optionnel)</FormLabel>
                       <Input
                         name="address"
                         value={formData.address}
@@ -283,11 +330,17 @@ const ReportIssuePage = () => {
                         size="lg"
                         borderRadius="lg"
                         isDisabled={loading}
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                        _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 3px rgba(90, 110, 255, 0.3)" }}
+                        _placeholder={{ color: 'whiteAlpha.500' }}
                       />
                     </FormControl>
 
                     <FormControl>
-                      <FormLabel fontWeight="500">Photo (optionnel)</FormLabel>
+                      <FormLabel fontWeight="500" color="white">Photo (optionnel)</FormLabel>
                       <Input
                         type="file"
                         accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -295,11 +348,14 @@ const ReportIssuePage = () => {
                         isDisabled={loading}
                         p={1}
                         borderRadius="lg"
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
                       />
-                      <FormHelperText>JPEG, PNG, GIF ou WebP - Max 5MB</FormHelperText>
+                      <FormHelperText color="whiteAlpha.600">JPEG, PNG, GIF ou WebP - Max 5MB</FormHelperText>
                       
                       {photoPreview && (
-                        <Box mt={3} borderRadius="lg" overflow="hidden" border="1px" borderColor="gray.200">
+                        <Box mt={3} borderRadius="lg" overflow="hidden" border="1px" borderColor="rgba(90, 110, 255, 0.3)">
                           <Image 
                             src={photoPreview} 
                             alt="Aperçu" 
@@ -313,7 +369,8 @@ const ReportIssuePage = () => {
 
                     <Button
                       type="submit"
-                      colorScheme="blue"
+                      bgGradient="linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)"
+                      color="white"
                       size="lg"
                       w="full"
                       borderRadius="xl"
@@ -321,6 +378,11 @@ const ReportIssuePage = () => {
                       loadingText="Envoi en cours..."
                       isDisabled={!formData.latitude}
                       mt={2}
+                      fontWeight="600"
+                      _hover={{
+                        bgGradient: "linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)",
+                        boxShadow: "0 8px 32px rgba(90, 110, 255, 0.4)"
+                      }}
                     >
                       ✉️ Envoyer le signalement
                     </Button>

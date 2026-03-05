@@ -116,21 +116,34 @@ const RegisterPage = () => {
   };
 
   return (
-    <Box minH="calc(100vh - 64px)" py={12} px={4} bg="gray.50">
+    <Box minH="calc(100vh - 64px)" py={12} px={4} bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)">
       <Container maxW="md">
         <Stack spacing={8} align="center">
           {/* Header */}
           <Stack spacing={2} textAlign="center">
-            <Heading fontSize="3xl" fontWeight="bold" color="gray.800">
+            <Heading 
+              fontSize="3xl" 
+              fontWeight="bold" 
+              bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+              bgClip="text"
+            >
               Rejoignez CityTracker
             </Heading>
-            <Text fontSize="md" color="gray.600">
+            <Text fontSize="md" color="whiteAlpha.700">
               Créez votre compte et participez à l'amélioration de votre ville
             </Text>
           </Stack>
 
           {/* Card */}
-          <Card w="full" bg={cardBg} shadow="xl" borderRadius="2xl">
+          <Card 
+            w="full" 
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+            backdropFilter="blur(10px)"
+            shadow="xl" 
+            borderRadius="2xl"
+            border="1px"
+            borderColor="rgba(90, 110, 255, 0.2)"
+          >
             <CardBody p={8}>
               {error && (
                 <Alert status="error" borderRadius="lg" mb={6}>
@@ -142,7 +155,7 @@ const RegisterPage = () => {
               <form onSubmit={handleSubmit}>
                 <Stack spacing={5}>
                   <FormControl isRequired>
-                    <FormLabel fontWeight="500" color="gray.700">
+                    <FormLabel fontWeight="500" color="white">
                       Nom d'utilisateur
                     </FormLabel>
                     <InputGroup>
@@ -163,7 +176,7 @@ const RegisterPage = () => {
                   </FormControl>
 
                   <FormControl isRequired>
-                    <FormLabel fontWeight="500" color="gray.700">
+                    <FormLabel fontWeight="500" color="white">
                       Adresse email
                     </FormLabel>
                     <InputGroup>
@@ -184,7 +197,7 @@ const RegisterPage = () => {
                   </FormControl>
 
                   <FormControl isRequired>
-                    <FormLabel fontWeight="500" color="gray.700">
+                    <FormLabel fontWeight="500" color="white">
                       Mot de passe
                     </FormLabel>
                     <InputGroup>
@@ -210,7 +223,7 @@ const RegisterPage = () => {
                           colorScheme={strengthColor}
                           borderRadius="full"
                         />
-                        <Text fontSize="xs" color="gray.500" mt={1}>
+                        <Text fontSize="xs" color="whiteAlpha.600" mt={1}>
                           Force du mot de passe : {passwordStrength <= 25 ? 'Faible' : passwordStrength <= 50 ? 'Moyen' : passwordStrength <= 75 ? 'Bon' : 'Excellent'}
                         </Text>
                       </Box>
@@ -218,7 +231,7 @@ const RegisterPage = () => {
                   </FormControl>
 
                   <FormControl isRequired>
-                    <FormLabel fontWeight="500" color="gray.700">
+                    <FormLabel fontWeight="500" color="white">
                       Confirmer le mot de passe
                     </FormLabel>
                     <InputGroup>
@@ -263,20 +276,21 @@ const RegisterPage = () => {
 
               <HStack my={6}>
                 <Divider />
-                <Text fontSize="sm" color="gray.500" whiteSpace="nowrap" px={2}>
+                <Text fontSize="sm" color="whiteAlpha.500" whiteSpace="nowrap" px={2}>
                   ou
                 </Text>
                 <Divider />
               </HStack>
 
-              <Text textAlign="center" color="gray.600">
+              <Text textAlign="center" color="whiteAlpha.700">
                 Déjà un compte ?{' '}
                 <Link
                   as={RouterLink}
                   to="/login"
-                  color="blue.500"
+                  bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+                  bgClip="text"
                   fontWeight="600"
-                  _hover={{ color: 'blue.600', textDecoration: 'underline' }}
+                  _hover={{ textDecoration: 'underline' }}
                 >
                   Se connecter
                 </Link>
@@ -285,7 +299,7 @@ const RegisterPage = () => {
           </Card>
 
           {/* Footer */}
-          <Text fontSize="sm" color="gray.500" textAlign="center">
+          <Text fontSize="sm" color="whiteAlpha.600" textAlign="center">
             En créant un compte, vous acceptez nos conditions d'utilisation
           </Text>
         </Stack>

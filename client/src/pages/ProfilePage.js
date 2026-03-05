@@ -31,7 +31,6 @@ import {
   AlertIcon,
   Flex,
   Divider,
-  useColorModeValue,
   Spinner,
   Center,
 } from '@chakra-ui/react';
@@ -50,9 +49,6 @@ const ProfilePage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   // Initialise le formulaire avec les données utilisateur
   useEffect(() => {
@@ -131,20 +127,26 @@ const ProfilePage = () => {
 
   if (!user) {
     return (
-      <Center minH="calc(100vh - 64px)">
+      <Center minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)">
         <Spinner size="xl" color="blue.500" />
       </Center>
     );
   }
 
   return (
-    <Box minH="calc(100vh - 64px)" bg="gray.50" py={8}>
+    <Box minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)" py={8}>
       <Container maxW="900px">
         <VStack spacing={6} align="stretch">
           {/* --- En-tête --- */}
           <Box>
-            <Heading size="lg" color="gray.800">Mon Profil</Heading>
-            <Text color="gray.600">Gérez vos informations personnelles et visualisez vos statistiques</Text>
+            <Heading 
+              size="lg" 
+              bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+              bgClip="text"
+            >
+              Mon Profil
+            </Heading>
+            <Text color="whiteAlpha.700">Gérez vos informations personnelles et visualisez vos statistiques</Text>
           </Box>
 
           {/* Message de succès/erreur */}
@@ -152,6 +154,9 @@ const ProfilePage = () => {
             <Alert 
               status={message.type === 'success' ? 'success' : 'error'} 
               borderRadius="lg"
+              bg={message.type === 'success' ? 'rgba(0, 179, 144, 0.2)' : 'rgba(230, 0, 0, 0.1)'}
+              borderColor={message.type === 'success' ? 'rgba(0, 179, 144, 0.4)' : 'rgba(230, 0, 0, 0.3)'}
+              border="1px"
             >
               <AlertIcon />
               {message.text}
@@ -159,10 +164,17 @@ const ProfilePage = () => {
           )}
 
           {/* --- Carte profil --- */}
-          <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+          <Card 
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+            backdropFilter="blur(10px)"
+            shadow="lg" 
+            borderRadius="xl" 
+            border="1px" 
+            borderColor="rgba(90, 110, 255, 0.2)"
+          >
             <CardHeader pb={0}>
               <Flex justify="space-between" align="center">
-                <Heading size="md">Informations personnelles</Heading>
+                <Heading size="md" color="white">Informations personnelles</Heading>
                 {!isEditing && (
                   <Button
                     leftIcon={<EditIcon />}
@@ -170,6 +182,9 @@ const ProfilePage = () => {
                     size="sm"
                     onClick={() => setIsEditing(true)}
                     borderRadius="lg"
+                    color="whiteAlpha.800"
+                    borderColor="rgba(90, 110, 255, 0.5)"
+                    _hover={{ bg: 'rgba(90, 110, 255, 0.2)' }}
                   >
                     Modifier
                   </Button>
@@ -182,11 +197,11 @@ const ProfilePage = () => {
                 <Avatar
                   size="2xl"
                   name={user.username}
-                  bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                  bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
                   color="white"
                 />
                 <VStack spacing={1}>
-                  <Text fontWeight="bold" fontSize="xl">{user.username}</Text>
+                  <Text fontWeight="bold" fontSize="xl" color="white">{user.username}</Text>
                   <Badge
                     colorScheme={user.role === 'admin' ? 'purple' : 'blue'}
                     px={3}
@@ -199,24 +214,29 @@ const ProfilePage = () => {
                 </VStack>
               </VStack>
 
-              <Divider mb={6} />
+              <Divider mb={6} borderColor="rgba(90, 110, 255, 0.2)" />
 
               {isEditing ? (
                 <form onSubmit={handleSubmit}>
                   <VStack spacing={4} align="stretch">
                     <FormControl isRequired>
-                      <FormLabel fontWeight="500">Nom d'utilisateur</FormLabel>
+                      <FormLabel fontWeight="500" color="white">Nom d'utilisateur</FormLabel>
                       <Input
                         name="username"
                         value={formData.username}
                         onChange={handleChange}
                         borderRadius="lg"
                         size="lg"
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                        _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 1px #5A6EFF" }}
                       />
                     </FormControl>
 
                     <FormControl isRequired>
-                      <FormLabel fontWeight="500">Adresse email</FormLabel>
+                      <FormLabel fontWeight="500" color="white">Adresse email</FormLabel>
                       <Input
                         name="email"
                         type="email"
@@ -224,6 +244,11 @@ const ProfilePage = () => {
                         onChange={handleChange}
                         borderRadius="lg"
                         size="lg"
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                        _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 1px #5A6EFF" }}
                       />
                     </FormControl>
 
@@ -234,16 +259,21 @@ const ProfilePage = () => {
                         onClick={handleCancel}
                         isDisabled={loading}
                         borderRadius="lg"
+                        color="whiteAlpha.800"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ bg: 'rgba(90, 110, 255, 0.2)' }}
                       >
                         Annuler
                       </Button>
                       <Button
                         leftIcon={<CheckIcon />}
-                        colorScheme="blue"
+                        bgGradient="linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)"
+                        color="white"
                         type="submit"
                         isLoading={loading}
                         loadingText="Enregistrement..."
                         borderRadius="lg"
+                        _hover={{ bgGradient: "linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)" }}
                       >
                         Enregistrer
                       </Button>
@@ -252,23 +282,23 @@ const ProfilePage = () => {
                 </form>
               ) : (
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                  <Box p={4} bg="gray.50" borderRadius="lg">
-                    <Text fontSize="sm" color="gray.500" mb={1}>Nom d'utilisateur</Text>
-                    <Text fontWeight="600" color="gray.800">{user.username}</Text>
+                  <Box p={4} bg="rgba(42, 49, 89, 0.5)" borderRadius="lg" border="1px" borderColor="rgba(90, 110, 255, 0.2)">
+                    <Text fontSize="sm" color="whiteAlpha.600" mb={1}>Nom d'utilisateur</Text>
+                    <Text fontWeight="600" color="white">{user.username}</Text>
                   </Box>
-                  <Box p={4} bg="gray.50" borderRadius="lg">
-                    <Text fontSize="sm" color="gray.500" mb={1}>Adresse email</Text>
-                    <Text fontWeight="600" color="gray.800">{user.email}</Text>
+                  <Box p={4} bg="rgba(42, 49, 89, 0.5)" borderRadius="lg" border="1px" borderColor="rgba(90, 110, 255, 0.2)">
+                    <Text fontSize="sm" color="whiteAlpha.600" mb={1}>Adresse email</Text>
+                    <Text fontWeight="600" color="white">{user.email}</Text>
                   </Box>
-                  <Box p={4} bg="gray.50" borderRadius="lg">
-                    <Text fontSize="sm" color="gray.500" mb={1}>Rôle</Text>
-                    <Text fontWeight="600" color="gray.800">
+                  <Box p={4} bg="rgba(42, 49, 89, 0.5)" borderRadius="lg" border="1px" borderColor="rgba(90, 110, 255, 0.2)">
+                    <Text fontSize="sm" color="whiteAlpha.600" mb={1}>Rôle</Text>
+                    <Text fontWeight="600" color="white">
                       {user.role === 'admin' ? 'Administrateur' : 'Citoyen'}
                     </Text>
                   </Box>
-                  <Box p={4} bg="gray.50" borderRadius="lg">
-                    <Text fontSize="sm" color="gray.500" mb={1}>Membre depuis</Text>
-                    <Text fontWeight="600" color="gray.800">{formatDate(user.createdAt)}</Text>
+                  <Box p={4} bg="rgba(42, 49, 89, 0.5)" borderRadius="lg" border="1px" borderColor="rgba(90, 110, 255, 0.2)">
+                    <Text fontSize="sm" color="whiteAlpha.600" mb={1}>Membre depuis</Text>
+                    <Text fontWeight="600" color="white">{formatDate(user.createdAt)}</Text>
                   </Box>
                 </SimpleGrid>
               )}
@@ -276,17 +306,25 @@ const ProfilePage = () => {
           </Card>
 
           {/* Statistics Card */}
-          <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+          <Card 
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+            backdropFilter="blur(10px)"
+            shadow="lg" 
+            borderRadius="xl" 
+            border="1px" 
+            borderColor="rgba(90, 110, 255, 0.2)"
+          >
             <CardHeader>
-              <Heading size="md">Mes statistiques</Heading>
+              <Heading size="md" color="white">Mes statistiques</Heading>
             </CardHeader>
             <CardBody pt={0}>
               <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
                 <Stat
                   p={6}
-                  bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                  bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
                   borderRadius="xl"
                   color="white"
+                  boxShadow="0 8px 32px rgba(90, 110, 255, 0.3)"
                 >
                   <StatLabel fontSize="sm" opacity={0.9}>Signalements</StatLabel>
                   <StatNumber fontSize="3xl" fontWeight="bold">{userStats.totalIssues}</StatNumber>
@@ -295,9 +333,10 @@ const ProfilePage = () => {
 
                 <Stat
                   p={6}
-                  bg="linear-gradient(135deg, #38A169 0%, #2F855A 100%)"
+                  bgGradient="linear-gradient(135deg, #00B390 0%, #25C4FF 100%)"
                   borderRadius="xl"
                   color="white"
+                  boxShadow="0 8px 32px rgba(0, 184, 245, 0.3)"
                 >
                   <StatLabel fontSize="sm" opacity={0.9}>Résolus</StatLabel>
                   <StatNumber fontSize="3xl" fontWeight="bold">{userStats.resolvedIssues}</StatNumber>
@@ -306,9 +345,10 @@ const ProfilePage = () => {
 
                 <Stat
                   p={6}
-                  bg="linear-gradient(135deg, #ED8936 0%, #C05621 100%)"
+                  bgGradient="linear-gradient(135deg, #FF9800 0%, #FFD41A 100%)"
                   borderRadius="xl"
                   color="white"
+                  boxShadow="0 8px 32px rgba(255, 152, 0, 0.3)"
                 >
                   <StatLabel fontSize="sm" opacity={0.9}>Votes reçus</StatLabel>
                   <StatNumber fontSize="3xl" fontWeight="bold">{userStats.totalVotes}</StatNumber>
@@ -319,22 +359,29 @@ const ProfilePage = () => {
           </Card>
 
           {/* Account Info Card */}
-          <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+          <Card 
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+            backdropFilter="blur(10px)"
+            shadow="lg" 
+            borderRadius="xl" 
+            border="1px" 
+            borderColor="rgba(90, 110, 255, 0.2)"
+          >
             <CardHeader>
-              <Heading size="md">Informations du compte</Heading>
+              <Heading size="md" color="white">Informations du compte</Heading>
             </CardHeader>
             <CardBody pt={0}>
               <VStack spacing={4} align="stretch">
-                <Flex justify="space-between" p={4} bg="gray.50" borderRadius="lg">
+                <Flex justify="space-between" p={4} bg="rgba(42, 49, 89, 0.5)" borderRadius="lg" border="1px" borderColor="rgba(90, 110, 255, 0.2)">
                   <Box>
-                    <Text fontWeight="600" color="gray.700">Identifiant unique</Text>
-                    <Text fontSize="sm" color="gray.500">{user.id}</Text>
+                    <Text fontWeight="600" color="white">Identifiant unique</Text>
+                    <Text fontSize="sm" color="whiteAlpha.600">{user.id}</Text>
                   </Box>
                 </Flex>
-                <Flex justify="space-between" p={4} bg="gray.50" borderRadius="lg">
+                <Flex justify="space-between" p={4} bg="rgba(42, 49, 89, 0.5)" borderRadius="lg" border="1px" borderColor="rgba(90, 110, 255, 0.2)">
                   <Box>
-                    <Text fontWeight="600" color="gray.700">Dernière mise à jour</Text>
-                    <Text fontSize="sm" color="gray.500">{formatDate(user.updatedAt)}</Text>
+                    <Text fontWeight="600" color="white">Dernière mise à jour</Text>
+                    <Text fontSize="sm" color="whiteAlpha.600">{formatDate(user.updatedAt)}</Text>
                   </Box>
                 </Flex>
               </VStack>

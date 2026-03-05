@@ -19,7 +19,6 @@ import {
   Badge,
   Flex,
   Icon,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { TimeIcon } from '@chakra-ui/icons';
 
@@ -74,8 +73,6 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
 
   // URL du serveur pour les images
   const SERVER_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   const status = statusConfig[issue.status] || statusConfig.open;
 
@@ -83,19 +80,20 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
     <Card
       as={RouterLink}
       to={`/issues/${issue.id}`}
-      bg={cardBg}
+      bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+      backdropFilter="blur(10px)"
       borderRadius="xl"
       overflow="hidden"
-      border="2px"
-      borderColor={isNew ? 'green.400' : borderColor}
-      shadow={isNew ? 'xl' : 'sm'}
-      transition="all 0.2s"
+      border="1px"
+      borderColor={isNew ? "rgba(16, 185, 129, 0.5)" : "rgba(90, 110, 255, 0.2)"}
+      boxShadow={isNew ? "0 10px 40px rgba(16, 185, 129, 0.3)" : "lg"}
+      transition="all 0.3s"
       position="relative"
       className={isNew ? 'new-issue-card' : ''}
       _hover={{
-        shadow: 'lg',
+        boxShadow: '0 15px 50px rgba(90, 110, 255, 0.4)',
         transform: 'translateY(-4px)',
-        borderColor: 'blue.300',
+        borderColor: 'rgba(90, 110, 255, 0.5)',
         textDecoration: 'none',
       }}
     >
@@ -104,7 +102,7 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
           position="absolute"
           top="-8px"
           right="12px"
-          bg="green.400"
+          bg="#10B981"
           color="white"
           fontSize="xs"
           fontWeight="bold"
@@ -114,6 +112,7 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
           zIndex={10}
           textTransform="uppercase"
           className="badge-new"
+          boxShadow="0 4px 12px rgba(16, 185, 129, 0.4)"
         >
           ✨ Nouveau
         </Badge>
@@ -131,10 +130,10 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
         ) : (
           <Flex
             h="100%"
-            bg="gray.100"
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.8) 0%, rgba(35, 45, 63, 0.8) 100%)"
             align="center"
             justify="center"
-            color="gray.400"
+            color="whiteAlpha.500"
           >
             <VStack spacing={2}>
               <Text fontSize="3xl">📷</Text>
@@ -148,12 +147,15 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
           position="absolute"
           top={3}
           left={3}
-          bg="blackAlpha.700"
+          bg="rgba(0, 0, 0, 0.8)"
+          backdropFilter="blur(6px)"
           color="white"
           fontSize="xs"
           px={2}
           py={1}
           borderRadius="md"
+          border="1px"
+          borderColor="rgba(90, 110, 255, 0.5)"
         >
           {categoryIcons[issue.category]} {categoryLabels[issue.category] || issue.category}
         </Badge>
@@ -165,7 +167,8 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
           <Heading 
             size="sm" 
             noOfLines={2}
-            color="gray.800"
+            bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+            bgClip="text"
           >
             {issue.title}
           </Heading>
@@ -173,7 +176,7 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
           {/* Description */}
           <Text 
             fontSize="sm" 
-            color="gray.600" 
+            color="whiteAlpha.700" 
             noOfLines={2}
           >
             {issue.description}
@@ -194,18 +197,23 @@ const IssueCard = ({ issue, isNew, onNewSeen }) => {
           </HStack>
 
           {/* Meta Info */}
-          <Flex justify="space-between" align="center" pt={2} borderTop="1px" borderColor="gray.100">
+          <Flex justify="space-between" align="center" pt={2} borderTop="1px" borderColor="rgba(90, 110, 255, 0.2)">
             <HStack spacing={1}>
               <Text fontSize="lg">👍</Text>
-              <Text fontSize="sm" fontWeight="600" color="blue.600">
+              <Text 
+                fontSize="sm" 
+                fontWeight="600" 
+                bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+                bgClip="text"
+              >
                 {issue.voteCount}
               </Text>
-              <Text fontSize="xs" color="gray.500">
+              <Text fontSize="xs" color="whiteAlpha.600">
                 votes
               </Text>
             </HStack>
             
-            <HStack spacing={1} color="gray.500">
+            <HStack spacing={1} color="whiteAlpha.600">
               <Icon as={TimeIcon} boxSize={3} />
               <Text fontSize="xs">
                 {formatDate(issue.createdAt)}

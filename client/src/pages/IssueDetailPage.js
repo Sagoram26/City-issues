@@ -27,7 +27,6 @@ import {
   AlertIcon,
   Spinner,
   Center,
-  useColorModeValue,
   useToast,
   AlertDialog,
   AlertDialogBody,
@@ -61,9 +60,6 @@ const IssueDetailPage = () => {
   const [error, setError] = useState(null);           // Erreur
   const [voting, setVoting] = useState(false);        // Vote en cours
   const [statusUpdating, setStatusUpdating] = useState(false); // MAJ statut en cours
-
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   // Configuration des statuts
   const statusConfig = {
@@ -219,10 +215,10 @@ const IssueDetailPage = () => {
 
   if (loading) {
     return (
-      <Center minH="calc(100vh - 64px)" bg="gray.50">
+      <Center minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)">
         <VStack spacing={4}>
           <Spinner size="xl" color="blue.500" thickness="4px" />
-          <Text color="gray.500">Chargement du signalement...</Text>
+          <Text color="whiteAlpha.700">Chargement du signalement...</Text>
         </VStack>
       </Center>
     );
@@ -230,9 +226,15 @@ const IssueDetailPage = () => {
 
   if (error || !issue) {
     return (
-      <Box minH="calc(100vh - 64px)" bg="gray.50" py={8}>
+      <Box minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)" py={8}>
         <Container maxW="800px">
-          <Alert status="error" borderRadius="lg" mb={4}>
+          <Alert 
+            status="error" 
+            borderRadius="lg" 
+            mb={4}
+            bg="rgba(230, 0, 0, 0.1)"
+            borderColor="rgba(230, 0, 0, 0.3)"
+          >
             <AlertIcon />
             {error || 'Signalement non trouvé'}
           </Alert>
@@ -240,7 +242,11 @@ const IssueDetailPage = () => {
             as={RouterLink}
             to="/"
             leftIcon={<ArrowBackIcon />}
-            colorScheme="blue"
+            bgGradient="linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)"
+            color="white"
+            _hover={{
+              bgGradient: "linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)"
+            }}
           >
             Retour à l'accueil
           </Button>
@@ -253,7 +259,7 @@ const IssueDetailPage = () => {
   const category = categoryConfig[issue.category] || categoryConfig.other;
 
   return (
-    <Box minH="calc(100vh - 64px)" bg="gray.50" py={8}>
+    <Box minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)" py={8}>
       <Container maxW="900px">
         <VStack spacing={6} align="stretch">
           {/* Back Button */}
@@ -263,14 +269,15 @@ const IssueDetailPage = () => {
             leftIcon={<ArrowBackIcon />}
             variant="ghost"
             alignSelf="flex-start"
-            color="gray.600"
+            color="whiteAlpha.700"
+            _hover={{ color: 'white', bg: 'rgba(90, 110, 255, 0.2)' }}
           >
             Retour à la carte
           </Button>
 
           {/* Photo */}
           {issue.photoUrl && (
-            <Box borderRadius="xl" overflow="hidden" shadow="md">
+            <Box borderRadius="xl" overflow="hidden" shadow="lg" border="1px" borderColor="rgba(90, 110, 255, 0.2)">
               <Image
                 src={`${SERVER_URL}${issue.photoUrl}`}
                 alt={issue.title}
@@ -282,7 +289,14 @@ const IssueDetailPage = () => {
           )}
 
           {/* Main Card */}
-          <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+          <Card 
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+            backdropFilter="blur(10px)"
+            shadow="lg" 
+            borderRadius="xl" 
+            border="1px" 
+            borderColor="rgba(90, 110, 255, 0.2)"
+          >
             <CardBody p={6}>
               {/* Header */}
               <VStack align="stretch" spacing={4}>
@@ -309,13 +323,17 @@ const IssueDetailPage = () => {
                     </Badge>
                   </HStack>
                   
-                  <HStack spacing={1} color="gray.500" fontSize="sm">
+                  <HStack spacing={1} color="whiteAlpha.600" fontSize="sm">
                     <Icon as={TimeIcon} />
                     <Text>{formatDate(issue.createdAt)}</Text>
                   </HStack>
                 </HStack>
 
-                <Heading size="lg" color="gray.800">
+                <Heading 
+                  size="lg" 
+                  bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+                  bgClip="text"
+                >
                   {issue.title}
                 </Heading>
 
@@ -324,46 +342,50 @@ const IssueDetailPage = () => {
                   <Avatar
                     size="sm"
                     name={issue.reporter?.username}
-                    bg="blue.500"
+                    bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
                   />
                   <Box>
-                    <Text fontSize="sm" color="gray.500">Signalé par</Text>
-                    <Text fontWeight="600" color="gray.700">
+                    <Text fontSize="sm" color="whiteAlpha.600">Signalé par</Text>
+                    <Text fontWeight="600" color="white">
                       {issue.reporter?.username || 'Anonyme'}
                     </Text>
                   </Box>
                 </HStack>
 
                 {issue.address && (
-                  <HStack spacing={2} color="gray.600">
+                  <HStack spacing={2} color="whiteAlpha.700">
                     <Text>📍</Text>
                     <Text>{issue.address}</Text>
                   </HStack>
                 )}
 
-                <Divider />
+                <Divider borderColor="rgba(90, 110, 255, 0.2)" />
 
                 {/* Description */}
                 <Box>
-                  <Heading size="sm" mb={2} color="gray.700">Description</Heading>
-                  <Text color="gray.600" whiteSpace="pre-wrap">
+                  <Heading size="sm" mb={2} color="white">Description</Heading>
+                  <Text color="whiteAlpha.800" whiteSpace="pre-wrap">
                     {issue.description}
                   </Text>
                 </Box>
 
-                <Divider />
+                <Divider borderColor="rgba(90, 110, 255, 0.2)" />
 
                 {/* Actions */}
                 <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
                   <Button
                     onClick={handleVote}
-                    colorScheme={issue.userHasVoted ? 'green' : 'blue'}
-                    variant={issue.userHasVoted ? 'solid' : 'solid'}
+                    bgGradient={issue.userHasVoted ? "linear-gradient(135deg, #00B390 0%, #25C4FF 100%)" : "linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)"}
+                    color="white"
                     isDisabled={voting || issue.userHasVoted}
                     isLoading={voting}
                     size="lg"
                     borderRadius="xl"
                     leftIcon={<Text>👍</Text>}
+                    fontWeight="600"
+                    _hover={{
+                      boxShadow: "0 8px 32px rgba(90, 110, 255, 0.4)"
+                    }}
                   >
                     {issue.userHasVoted ? 'Voté' : 'Voter'} ({issue.voteCount})
                   </Button>
@@ -376,6 +398,16 @@ const IssueDetailPage = () => {
                         isDisabled={statusUpdating}
                         w="150px"
                         borderRadius="lg"
+                        bg="rgba(42, 49, 89, 0.9)"
+                        color="white"
+                        borderColor="rgba(90, 110, 255, 0.5)"
+                        _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                        sx={{
+                          '& option': {
+                            bg: '#1a1f2e',
+                            color: 'white',
+                          }
+                        }}
                       >
                         {Object.entries(statusConfig).map(([value, config]) => (
                           <option key={value} value={value}>{config.label}</option>
@@ -398,9 +430,17 @@ const IssueDetailPage = () => {
           </Card>
 
           {/* Map Card */}
-          <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor} overflow="hidden">
+          <Card 
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+            backdropFilter="blur(10px)"
+            shadow="lg" 
+            borderRadius="xl" 
+            border="1px" 
+            borderColor="rgba(90, 110, 255, 0.2)" 
+            overflow="hidden"
+          >
             <CardHeader>
-              <Heading size="md">📍 Localisation</Heading>
+              <Heading size="md" color="white">📍 Localisation</Heading>
             </CardHeader>
             <CardBody p={0}>
               <IssueMap
@@ -421,18 +461,29 @@ const IssueDetailPage = () => {
         leastDestructiveRef={cancelRef}
         onClose={onClose}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent borderRadius="xl">
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        <AlertDialogOverlay bg="rgba(0, 0, 0, 0.7)" backdropFilter="blur(4px)">
+          <AlertDialogContent 
+            borderRadius="xl" 
+            bg="linear-gradient(135deg, #1a1f2e 0%, #0F1419 100%)"
+            border="1px solid rgba(90, 110, 255, 0.3)"
+          >
+            <AlertDialogHeader fontSize="lg" fontWeight="bold" color="white">
               Supprimer le signalement
             </AlertDialogHeader>
 
-            <AlertDialogBody>
+            <AlertDialogBody color="whiteAlpha.800">
               Êtes-vous sûr de vouloir supprimer ce signalement ? Cette action est irréversible.
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onClose} borderRadius="lg">
+              <Button 
+                ref={cancelRef} 
+                onClick={onClose} 
+                borderRadius="lg"
+                variant="ghost"
+                color="whiteAlpha.800"
+                _hover={{ bg: 'rgba(90, 110, 255, 0.2)' }}
+              >
                 Annuler
               </Button>
               <Button colorScheme="red" onClick={handleDelete} ml={3} borderRadius="lg">

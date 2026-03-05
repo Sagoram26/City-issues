@@ -56,8 +56,14 @@ const ChangeView = ({ center, zoom }) => {
   const map = useMap();
   
   useEffect(() => {
-    if (center) {
-      map.setView(center, zoom);
+    if (center && map && map.getContainer()) {
+      // S'assurer que la carte est prête avant de changer la vue
+      try {
+        map.setView(center, zoom, { animate: false });
+      } catch (e) {
+        // Ignorer les erreurs si la carte n'est pas prête
+        console.warn('Map view change failed:', e);
+      }
     }
   }, [center, zoom, map]);
   
@@ -117,19 +123,23 @@ const IssueMap = ({
   return (
     <div className="map-container" style={{ height }}>
       <MapContainer
+        key="main-map"
         center={center}
         zoom={zoom}
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
+        whenReady={(map) => {
+          // S'assurer que la carte est correctement initialisée
+          setTimeout(() => {
+            map.target.invalidateSize();
+          }, 100);
+        }}
       >
         {/* Tuiles OpenStreetMap (fond de carte gratuit) */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
-        {/* Gère les changements de centre */}
-        <ChangeView center={center} zoom={zoom} />
         
         {/* Mode sélection : active le clic sur la carte */}
         {onLocationSelect && <LocationPicker onLocationSelect={onLocationSelect} />}

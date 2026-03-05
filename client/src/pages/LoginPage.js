@@ -78,21 +78,34 @@ const LoginPage = () => {
   };
 
   return (
-    <Box minH="calc(100vh - 64px)" py={12} px={4} bg="gray.50">
+    <Box minH="calc(100vh - 64px)" py={12} px={4} bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)">
       <Container maxW="md">
         <Stack spacing={8} align="center">
           {/* --- En-tête --- */}
           <Stack spacing={2} textAlign="center">
-            <Heading fontSize="3xl" fontWeight="bold" color="gray.800">
+            <Heading 
+              fontSize="3xl" 
+              fontWeight="bold" 
+              bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+              bgClip="text"
+            >
               Bon retour parmi nous
             </Heading>
-            <Text fontSize="md" color="gray.600">
+            <Text fontSize="md" color="whiteAlpha.700">
               Connectez-vous pour accéder à votre compte
             </Text>
           </Stack>
 
           {/* --- Carte formulaire --- */}
-          <Card w="full" bg={cardBg} shadow="xl" borderRadius="2xl">
+          <Card 
+            w="full" 
+            bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+            backdropFilter="blur(10px)"
+            shadow="xl" 
+            borderRadius="2xl"
+            border="1px"
+            borderColor="rgba(90, 110, 255, 0.2)"
+          >
             <CardBody p={8}>
               {/* Affichage de l'erreur */}
               {error && (
@@ -106,7 +119,7 @@ const LoginPage = () => {
                 <Stack spacing={5}>
                   {/* Champ email */}
                   <FormControl isRequired>
-                    <FormLabel fontWeight="500" color="gray.700">
+                    <FormLabel fontWeight="500" color="white">
                       Adresse email
                     </FormLabel>
                     <InputGroup>
@@ -128,7 +141,7 @@ const LoginPage = () => {
 
                   {/* Champ mot de passe */}
                   <FormControl isRequired>
-                    <FormLabel fontWeight="500" color="gray.700">
+                    <FormLabel fontWeight="500" color="white">
                       Mot de passe
                     </FormLabel>
                     <InputGroup>
@@ -169,21 +182,22 @@ const LoginPage = () => {
               {/* Séparateur */}
               <HStack my={6}>
                 <Divider />
-                <Text fontSize="sm" color="gray.500" whiteSpace="nowrap" px={2}>
+                <Text fontSize="sm" color="whiteAlpha.500" whiteSpace="nowrap" px={2}>
                   ou
                 </Text>
                 <Divider />
               </HStack>
 
               {/* Lien vers inscription */}
-              <Text textAlign="center" color="gray.600">
+              <Text textAlign="center" color="whiteAlpha.700">
                 Pas encore de compte ?{' '}
                 <Link
                   as={RouterLink}
                   to="/register"
-                  color="blue.500"
+                  bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+                  bgClip="text"
                   fontWeight="600"
-                  _hover={{ color: 'blue.600', textDecoration: 'underline' }}
+                  _hover={{ textDecoration: 'underline' }}
                 >
                   Créer un compte
                 </Link>
@@ -192,7 +206,7 @@ const LoginPage = () => {
           </Card>
 
           {/* Pied de page */}
-          <Text fontSize="sm" color="gray.500" textAlign="center">
+          <Text fontSize="sm" color="whiteAlpha.600" textAlign="center">
             En vous connectant, vous acceptez nos conditions d'utilisation
           </Text>
         </Stack>

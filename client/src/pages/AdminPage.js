@@ -37,7 +37,6 @@ import {
   Spinner,
   Center,
   Link,
-  useColorModeValue,
   useToast,
   AlertDialog,
   AlertDialogBody,
@@ -68,9 +67,6 @@ const AdminPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure(); // Dialog de confirmation
   const cancelRef = React.useRef();
   const toast = useToast();
-
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   // --- Chargement initial des données ---
   useEffect(() => {
@@ -202,70 +198,119 @@ const AdminPage = () => {
 
   if (loading) {
     return (
-      <Center minH="calc(100vh - 64px)" bg="gray.50">
+      <Center minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)">
         <VStack spacing={4}>
           <Spinner size="xl" color="blue.500" thickness="4px" />
-          <Text color="gray.500">Chargement des données...</Text>
+          <Text color="whiteAlpha.700">Chargement des données...</Text>
         </VStack>
       </Center>
     );
   }
 
   return (
-    <Box minH="calc(100vh - 64px)" bg="gray.50" py={8}>
+    <Box minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)" py={8}>
       <Container maxW="1400px">
         <VStack spacing={6} align="stretch">
           {/* Header */}
           <Box>
             <HStack spacing={2} mb={1}>
-              <Heading size="lg" color="gray.800">Administration</Heading>
+              <Heading 
+                size="lg" 
+                bgGradient="linear-gradient(135deg, #5A6EFF 0%, #00B8F5 100%)"
+                bgClip="text"
+              >
+                Administration
+              </Heading>
               <Badge colorScheme="purple" fontSize="sm">Pro</Badge>
             </HStack>
-            <Text color="gray.600">Gérez les signalements et les utilisateurs</Text>
+            <Text color="whiteAlpha.700">Gérez les signalements et les utilisateurs</Text>
           </Box>
 
           {/* Stats */}
           <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(90, 110, 255, 0.2)"
+            >
               <CardBody textAlign="center" py={6}>
                 <Stat>
-                  <StatNumber fontSize="3xl" fontWeight="bold" color="gray.700">
+                  <StatNumber fontSize="3xl" fontWeight="bold" color="white">
                     {stats.totalIssues}
                   </StatNumber>
-                  <StatLabel fontSize="sm" color="gray.500">Signalements</StatLabel>
+                  <StatLabel fontSize="sm" color="whiteAlpha.700">Signalements</StatLabel>
                 </Stat>
               </CardBody>
             </Card>
 
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(255, 152, 0, 0.3)"
+            >
               <CardBody textAlign="center" py={6}>
                 <Stat>
-                  <StatNumber fontSize="3xl" fontWeight="bold" color="orange.500">
+                  <StatNumber 
+                    fontSize="3xl" 
+                    fontWeight="bold" 
+                    bgGradient="linear(to-r, #FF9800, #F59E0B)"
+                    bgClip="text"
+                  >
                     {stats.openIssues}
                   </StatNumber>
-                  <StatLabel fontSize="sm" color="gray.500">À traiter</StatLabel>
+                  <StatLabel fontSize="sm" color="whiteAlpha.700">À traiter</StatLabel>
                 </Stat>
               </CardBody>
             </Card>
 
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(0, 184, 245, 0.3)"
+            >
               <CardBody textAlign="center" py={6}>
                 <Stat>
-                  <StatNumber fontSize="3xl" fontWeight="bold" color="blue.500">
+                  <StatNumber 
+                    fontSize="3xl" 
+                    fontWeight="bold" 
+                    bgGradient="linear(to-r, #00B8F5, #5A6EFF)"
+                    bgClip="text"
+                  >
                     {stats.totalUsers}
                   </StatNumber>
-                  <StatLabel fontSize="sm" color="gray.500">Utilisateurs</StatLabel>
+                  <StatLabel fontSize="sm" color="whiteAlpha.700">Utilisateurs</StatLabel>
                 </Stat>
               </CardBody>
             </Card>
 
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(139, 92, 246, 0.3)"
+            >
               <CardBody textAlign="center" py={6}>
                 <Stat>
-                  <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
+                  <StatNumber 
+                    fontSize="3xl" 
+                    fontWeight="bold" 
+                    bgGradient="linear(to-r, #8B5CF6, #A855F7)"
+                    bgClip="text"
+                  >
                     {stats.admins}
                   </StatNumber>
-                  <StatLabel fontSize="sm" color="gray.500">Admins</StatLabel>
+                  <StatLabel fontSize="sm" color="whiteAlpha.700">Admins</StatLabel>
                 </Stat>
               </CardBody>
             </Card>
@@ -275,15 +320,19 @@ const AdminPage = () => {
           <ButtonGroup isAttached variant="outline" size="md">
             <Button
               onClick={() => setActiveTab('issues')}
-              colorScheme={activeTab === 'issues' ? 'blue' : 'gray'}
-              variant={activeTab === 'issues' ? 'solid' : 'outline'}
+              bg={activeTab === 'issues' ? 'linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)' : 'transparent'}
+              color="white"
+              borderColor="rgba(90, 110, 255, 0.5)"
+              _hover={{ bg: activeTab === 'issues' ? 'linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)' : 'rgba(90, 110, 255, 0.2)' }}
             >
               📋 Signalements ({issues.length})
             </Button>
             <Button
               onClick={() => setActiveTab('users')}
-              colorScheme={activeTab === 'users' ? 'blue' : 'gray'}
-              variant={activeTab === 'users' ? 'solid' : 'outline'}
+              bg={activeTab === 'users' ? 'linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)' : 'transparent'}
+              color="white"
+              borderColor="rgba(90, 110, 255, 0.5)"
+              _hover={{ bg: activeTab === 'users' ? 'linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)' : 'rgba(90, 110, 255, 0.2)' }}
             >
               👥 Utilisateurs ({users.length})
             </Button>
@@ -291,57 +340,74 @@ const AdminPage = () => {
 
           {/* Issues Table */}
           {activeTab === 'issues' && (
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(90, 110, 255, 0.2)"
+            >
               <CardHeader>
-                <Heading size="md">Liste des signalements</Heading>
+                <Heading size="md" color="white">Liste des signalements</Heading>
               </CardHeader>
               <CardBody pt={0}>
                 <TableContainer>
                   <Table variant="simple" size="sm">
                     <Thead>
                       <Tr>
-                        <Th>Titre</Th>
-                        <Th>Auteur</Th>
-                        <Th>Date</Th>
-                        <Th isNumeric>Votes</Th>
-                        <Th>Statut</Th>
-                        <Th>Actions</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Titre</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Auteur</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Date</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)" isNumeric>Votes</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Statut</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Actions</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {issues.map(issue => (
-                        <Tr key={issue.id}>
-                          <Td>
+                        <Tr key={issue.id} _hover={{ bg: 'rgba(90, 110, 255, 0.1)' }}>
+                          <Td borderColor="rgba(90, 110, 255, 0.1)">
                             <Link
                               as={RouterLink}
                               to={`/issues/${issue.id}`}
-                              color="blue.600"
+                              color="#00B8F5"
                               fontWeight="500"
-                              _hover={{ textDecoration: 'underline' }}
+                              _hover={{ textDecoration: 'underline', color: '#5A6EFF' }}
                             >
                               {issue.title.substring(0, 40)}
                               {issue.title.length > 40 ? '...' : ''}
                             </Link>
                           </Td>
-                          <Td>{issue.reporter?.username || 'N/A'}</Td>
-                          <Td>{formatDate(issue.createdAt)}</Td>
-                          <Td isNumeric>
+                          <Td color="whiteAlpha.800" borderColor="rgba(90, 110, 255, 0.1)">{issue.reporter?.username || 'N/A'}</Td>
+                          <Td color="whiteAlpha.700" borderColor="rgba(90, 110, 255, 0.1)">{formatDate(issue.createdAt)}</Td>
+                          <Td isNumeric borderColor="rgba(90, 110, 255, 0.1)">
                             <Badge colorScheme="blue">{issue.voteCount}</Badge>
                           </Td>
-                          <Td>
+                          <Td borderColor="rgba(90, 110, 255, 0.1)">
                             <Select
                               value={issue.status}
                               onChange={(e) => handleStatusChange(issue.id, e.target.value)}
                               size="sm"
                               w="130px"
                               borderRadius="md"
+                              bg="rgba(42, 49, 89, 0.9)"
+                              color="white"
+                              borderColor="rgba(90, 110, 255, 0.5)"
+                              _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                              sx={{
+                                '& option': {
+                                  bg: '#1a1f2e',
+                                  color: 'white',
+                                }
+                              }}
                             >
                               {Object.entries(statusConfig).map(([value, config]) => (
                                 <option key={value} value={value}>{config.label}</option>
                               ))}
                             </Select>
                           </Td>
-                          <Td>
+                          <Td borderColor="rgba(90, 110, 255, 0.1)">
                             <Button
                               size="sm"
                               colorScheme="red"
@@ -360,7 +426,7 @@ const AdminPage = () => {
                 
                 {issues.length === 0 && (
                   <Center py={8}>
-                    <Text color="gray.500">Aucun signalement</Text>
+                    <Text color="whiteAlpha.600">Aucun signalement</Text>
                   </Center>
                 )}
               </CardBody>
@@ -369,34 +435,51 @@ const AdminPage = () => {
 
           {/* Users Table */}
           {activeTab === 'users' && (
-            <Card bg={cardBg} shadow="sm" borderRadius="xl" border="1px" borderColor={borderColor}>
+            <Card 
+              bg="linear-gradient(135deg, rgba(42, 49, 89, 0.7) 0%, rgba(35, 45, 63, 0.7) 100%)"
+              backdropFilter="blur(10px)"
+              shadow="lg" 
+              borderRadius="xl" 
+              border="1px" 
+              borderColor="rgba(90, 110, 255, 0.2)"
+            >
               <CardHeader>
-                <Heading size="md">Liste des utilisateurs</Heading>
+                <Heading size="md" color="white">Liste des utilisateurs</Heading>
               </CardHeader>
               <CardBody pt={0}>
                 <TableContainer>
                   <Table variant="simple" size="sm">
                     <Thead>
                       <Tr>
-                        <Th>Nom d'utilisateur</Th>
-                        <Th>Email</Th>
-                        <Th>Inscrit le</Th>
-                        <Th>Rôle</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Nom d'utilisateur</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Email</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Inscrit le</Th>
+                        <Th color="whiteAlpha.600" borderColor="rgba(90, 110, 255, 0.2)">Rôle</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {users.map(user => (
-                        <Tr key={user.id}>
-                          <Td fontWeight="500">{user.username}</Td>
-                          <Td>{user.email}</Td>
-                          <Td>{formatDate(user.createdAt)}</Td>
-                          <Td>
+                        <Tr key={user.id} _hover={{ bg: 'rgba(90, 110, 255, 0.1)' }}>
+                          <Td fontWeight="500" color="white" borderColor="rgba(90, 110, 255, 0.1)">{user.username}</Td>
+                          <Td color="whiteAlpha.800" borderColor="rgba(90, 110, 255, 0.1)">{user.email}</Td>
+                          <Td color="whiteAlpha.700" borderColor="rgba(90, 110, 255, 0.1)">{formatDate(user.createdAt)}</Td>
+                          <Td borderColor="rgba(90, 110, 255, 0.1)">
                             <Select
                               value={user.role}
                               onChange={(e) => handleRoleChange(user.id, e.target.value)}
                               size="sm"
                               w="120px"
                               borderRadius="md"
+                              bg="rgba(42, 49, 89, 0.9)"
+                              color="white"
+                              borderColor="rgba(90, 110, 255, 0.5)"
+                              _hover={{ borderColor: "rgba(90, 110, 255, 0.8)" }}
+                              sx={{
+                                '& option': {
+                                  bg: '#1a1f2e',
+                                  color: 'white',
+                                }
+                              }}
                             >
                               <option value="citizen">Citoyen</option>
                               <option value="admin">Admin</option>
@@ -410,7 +493,7 @@ const AdminPage = () => {
                 
                 {users.length === 0 && (
                   <Center py={8}>
-                    <Text color="gray.500">Aucun utilisateur</Text>
+                    <Text color="whiteAlpha.600">Aucun utilisateur</Text>
                   </Center>
                 )}
               </CardBody>
@@ -425,18 +508,29 @@ const AdminPage = () => {
         leastDestructiveRef={cancelRef}
         onClose={onClose}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent borderRadius="xl">
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        <AlertDialogOverlay bg="rgba(0, 0, 0, 0.7)" backdropFilter="blur(4px)">
+          <AlertDialogContent 
+            borderRadius="xl" 
+            bg="linear-gradient(135deg, #1a1f2e 0%, #0F1419 100%)"
+            border="1px solid rgba(90, 110, 255, 0.3)"
+          >
+            <AlertDialogHeader fontSize="lg" fontWeight="bold" color="white">
               Supprimer le signalement
             </AlertDialogHeader>
 
-            <AlertDialogBody>
+            <AlertDialogBody color="whiteAlpha.800">
               Êtes-vous sûr de vouloir supprimer ce signalement ? Cette action est irréversible.
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onClose} borderRadius="lg">
+              <Button 
+                ref={cancelRef} 
+                onClick={onClose} 
+                borderRadius="lg"
+                variant="ghost"
+                color="whiteAlpha.800"
+                _hover={{ bg: 'rgba(90, 110, 255, 0.2)' }}
+              >
                 Annuler
               </Button>
               <Button colorScheme="red" onClick={handleDeleteIssue} ml={3} borderRadius="lg">

@@ -179,6 +179,15 @@ const HomePage = () => {
     fetchIssues();
   };
 
+  // Réinitialiser tous les filtres
+  const handleResetFilters = () => {
+    setFilters({
+      status: '',
+      category: '',
+      search: ''
+    });
+  };
+
   // Options pour les selects de filtre
   const statusOptions = [
     { value: '', label: 'Tous les statuts' },
@@ -200,11 +209,13 @@ const HomePage = () => {
   ];
 
   return (
-    <Box minH="calc(100vh - 64px)" bg="gray.50">
-      {/* --- Section Hero avec titre --- */}
+    <Box minH="calc(100vh - 64px)" bg="linear-gradient(135deg, #0F1419 0%, #1a1f2e 50%, #111318 100%)">
+      {/* --- Section Hero avec gradient métallisé premium --- */}
       <Box 
-        bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-        py={12}
+        bg="linear-gradient(135deg, #1a1f2e 0%, #2A3159 50%, #1a1f2e 100%)"
+        borderBottom="2px solid"
+        borderColor="rgba(90, 110, 255, 0.3)"
+        py={16}
         px={4}
       >
         <Container maxW="1400px">
@@ -236,11 +247,12 @@ const HomePage = () => {
               </Badge>
               {newIssueIds.size > 0 && (
                 <Badge 
-                  colorScheme="blue" 
+                  bgGradient="linear-gradient(135deg, #FF9800 0%, #FFD41A 100%)"
                   fontSize="sm" 
-                  px={3} 
-                  py={1} 
+                  px={4} 
+                  py={2} 
                   borderRadius="full"
+                  boxShadow="0 4px 16px rgba(255, 216, 26, 0.3)"
                   className="blink-notification"
                 >
                   🆕 {newIssueIds.size} nouveau(x)
@@ -256,12 +268,13 @@ const HomePage = () => {
         <Box
           as="form"
           onSubmit={handleSearchSubmit}
-          bg={cardBg}
+          bg="linear-gradient(135deg, rgba(42, 49, 89, 0.8) 0%, rgba(35, 45, 63, 0.8) 100%)"
+          backdropFilter="blur(10px)"
           borderRadius="xl"
-          shadow="sm"
+          shadow="lg"
           border="1px"
-          borderColor={borderColor}
-          p={4}
+          borderColor="rgba(90, 110, 255, 0.3)"
+          p={6}
           mb={6}
         >
           <Flex 
@@ -278,6 +291,21 @@ const HomePage = () => {
                 minW="160px"
                 borderRadius="lg"
                 size="md"
+                bg="rgba(42, 49, 89, 0.9)"
+                color="white"
+                fontWeight="600"
+                border="2px"
+                borderColor="rgba(90, 110, 255, 0.5)"
+                _hover={{ borderColor: "rgba(90, 110, 255, 0.8)", bg: "rgba(42, 49, 89, 1)" }}
+                _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 3px rgba(90, 110, 255, 0.3)" }}
+                sx={{
+                  '& option': {
+                    bg: '#1a1f2e',
+                    color: 'white',
+                    fontWeight: '500',
+                    _hover: { bg: '#2A3159' }
+                  }
+                }}
               >
                 {statusOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -291,6 +319,21 @@ const HomePage = () => {
                 minW="180px"
                 borderRadius="lg"
                 size="md"
+                bg="rgba(42, 49, 89, 0.9)"
+                color="white"
+                fontWeight="600"
+                border="2px"
+                borderColor="rgba(90, 110, 255, 0.5)"
+                _hover={{ borderColor: "rgba(90, 110, 255, 0.8)", bg: "rgba(42, 49, 89, 1)" }}
+                _focus={{ borderColor: "#5A6EFF", boxShadow: "0 0 0 3px rgba(90, 110, 255, 0.3)" }}
+                sx={{
+                  '& option': {
+                    bg: '#1a1f2e',
+                    color: 'white',
+                    fontWeight: '500',
+                    _hover: { bg: '#2A3159' }
+                  }
+                }}
               >
                 {categoryOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -310,8 +353,34 @@ const HomePage = () => {
                 />
               </InputGroup>
 
-              <Button type="submit" colorScheme="blue" borderRadius="lg">
+              <Button 
+                type="submit" 
+                bgGradient="linear-gradient(135deg, #5A6EFF 0%, #4E5EE6 100%)"
+                color="white"
+                fontWeight="600"
+                borderRadius="lg"
+                _hover={{
+                  bgGradient: "linear-gradient(135deg, #7B8EFF 0%, #5A6EFF 100%)",
+                  boxShadow: "0 8px 32px rgba(90, 110, 255, 0.4)"
+                }}
+              >
                 Filtrer
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleResetFilters}
+                variant="outline"
+                color="whiteAlpha.800"
+                borderColor="rgba(90, 110, 255, 0.5)"
+                fontWeight="600"
+                borderRadius="lg"
+                _hover={{
+                  bg: "rgba(90, 110, 255, 0.2)",
+                  borderColor: "rgba(90, 110, 255, 0.8)"
+                }}
+              >
+                ↻ Réinitialiser
               </Button>
             </HStack>
 
@@ -338,7 +407,13 @@ const HomePage = () => {
 
         {/* Error Display */}
         {error && (
-          <Alert status="error" borderRadius="lg" mb={6}>
+          <Alert 
+            status="error" 
+            borderRadius="lg" 
+            mb={6}
+            bg="rgba(230, 0, 0, 0.1)"
+            borderColor="rgba(230, 0, 0, 0.3)"
+          >
             <AlertIcon />
             {error}
           </Alert>
